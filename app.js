@@ -438,7 +438,7 @@ function writeLocalResponses(responses) {
 function getStorageConfig() {
   const config = typeof window.uxResearchConfig === "object" && window.uxResearchConfig ? window.uxResearchConfig : {};
   const supabaseUrl = String(config.supabaseUrl || "").trim().replace(/\/$/, "");
-  const supabaseAnonKey = String(config.supabaseAnonKey || "").trim();
+  const supabaseAnonKey = String(config.supabasePublishableKey || config.supabaseAnonKey || "").trim();
 
   return { supabaseUrl, supabaseAnonKey };
 }

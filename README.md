@@ -54,13 +54,13 @@ This is still a static app. If `config.js` is left empty, responses are stored i
 2. In the Supabase SQL editor, run the script in `supabase/schema.sql`.
 3. In Supabase, open `Project Settings`, then `API`, and copy:
 	 - Project URL
-	 - Project API anon key
+	 - Project API anon key or publishable key
 4. For local testing, open `config.js` and set:
 
 ```js
 window.uxResearchConfig = {
 	supabaseUrl: "https://YOUR-PROJECT.supabase.co",
-	supabaseAnonKey: "YOUR-ANON-KEY"
+	supabasePublishableKey: "YOUR-PUBLISHABLE-OR-ANON-KEY"
 };
 ```
 
@@ -78,7 +78,7 @@ If you deploy with GitHub Pages, do not rely on a manually edited checked-in `co
 	 - `UX_RESEARCH_SUPABASE_ANON_KEY`
 3. Redeploy the site.
 
-If those secrets are present, the workflow overwrites `config.js` during deployment with the correct Supabase values. If they are missing, the site falls back to whatever is committed in `config.js`, which means local-only mode if that file is blank.
+If those secrets are present, the workflow overwrites `config.js` during deployment with the correct Supabase values. You can store either the anon key or the publishable key in `UX_RESEARCH_SUPABASE_ANON_KEY`; this app accepts both. If they are missing, the site falls back to whatever is committed in `config.js`, which means local-only mode if that file is blank.
 
 ## Security note
 
