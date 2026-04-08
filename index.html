@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UX Research Survey</title>
+  <title>Woolens Tool Usability Survey</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="survey">
   <div class="page-shell">
     <aside class="hero-panel">
       <p class="eyebrow">Research Session Kit</p>
-      <h1>Government Dossier Tool Usability Survey</h1>
+      <h1>Woolens Tool Usability Survey</h1>
       <p class="hero-copy">
         Capture moderated session notes, task outcomes, SUS scores, and follow-up insights in one place.
       </p>
@@ -55,35 +55,52 @@
             <h2>Pre-task context</h2>
           </div>
           <div class="grid">
-            <label>
-              Prior familiarity with Woo dossiers or government information requests
-              <select name="backgroundWooFamiliarity" required>
-                <option value="">Select a level</option>
-                <option value="Never heard of them">Never heard of them</option>
-                <option value="Heard of them">Heard of them</option>
-                <option value="Some familiarity">Some familiarity</option>
-                <option value="Worked with them directly">Worked with them directly</option>
-              </select>
-            </label>
+            <fieldset class="option-group">
+              <legend>Prior familiarity with Woo dossiers or government information requests</legend>
+              <label class="option-row">
+                <input type="radio" name="backgroundWooFamiliarity" value="Never heard of them" required />
+                <span>Never heard of them</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundWooFamiliarity" value="Heard of them" />
+                <span>Heard of them</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundWooFamiliarity" value="Some familiarity" />
+                <span>Some familiarity</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundWooFamiliarity" value="Worked with them directly" />
+                <span>Worked with them directly</span>
+              </label>
+            </fieldset>
             <label>
               Have you ever heard of a Woo dossier or government information request?
               <textarea name="backgroundWoo" rows="3" placeholder="Participant answer"></textarea>
             </label>
-            <label>
-              How comfortable are you with reading official documents or government communication?
-              <select name="backgroundComfort" required>
-                <option value="">Select a level</option>
-                <option value="Very uncomfortable">Very uncomfortable</option>
-                <option value="Somewhat uncomfortable">Somewhat uncomfortable</option>
-                <option value="Neutral">Neutral</option>
-                <option value="Somewhat comfortable">Somewhat comfortable</option>
-                <option value="Very comfortable">Very comfortable</option>
-              </select>
-            </label>
-            <label>
-              Moderator notes
-              <textarea name="backgroundNotes" rows="3" placeholder="Prior familiarity, domain knowledge, tone"></textarea>
-            </label>
+            <fieldset class="option-group">
+              <legend>How comfortable are you with reading official documents or government communication?</legend>
+              <label class="option-row">
+                <input type="radio" name="backgroundComfort" value="Very uncomfortable" required />
+                <span>Very uncomfortable</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundComfort" value="Somewhat uncomfortable" />
+                <span>Somewhat uncomfortable</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundComfort" value="Neutral" />
+                <span>Neutral</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundComfort" value="Somewhat comfortable" />
+                <span>Somewhat comfortable</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="backgroundComfort" value="Very comfortable" />
+                <span>Very comfortable</span>
+              </label>
+            </fieldset>
           </div>
         </section>
 
@@ -98,7 +115,7 @@
               Participant response
               <textarea name="task1Response" rows="4" placeholder="What they said"></textarea>
             </label>
-            <label>
+            <label class="full-span">
               Was the purpose clear?
               <div class="range-control">
                 <div class="range-meta">
@@ -106,6 +123,10 @@
                   <strong data-range-output="task1Clarity">3/5</strong>
                 </div>
                 <input type="range" min="1" max="5" value="3" name="task1Clarity" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not at all</span>
+                  <span>5 Yes very clear</span>
+                </div>
               </div>
             </label>
             <label class="full-span">
@@ -126,15 +147,21 @@
               What did the participant find?
               <textarea name="task2Finding" rows="4" placeholder="Summary of what they learned"></textarea>
             </label>
-            <label>
-              Outcome
-              <select name="task2Outcome">
-                <option value="">Select</option>
-                <option value="Completed">Completed</option>
-                <option value="Partially completed">Partially completed</option>
-                <option value="Not completed">Not completed</option>
-              </select>
-            </label>
+            <fieldset class="option-group">
+              <legend>Outcome</legend>
+              <label class="option-row">
+                <input type="radio" name="task2Outcome" value="Completed" />
+                <span>Completed</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task2Outcome" value="Partially completed" />
+                <span>Partially completed</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task2Outcome" value="Not completed" />
+                <span>Not completed</span>
+              </label>
+            </fieldset>
             <label>
               Time taken (minutes)
               <input type="number" min="0" step="0.5" name="task2Time" placeholder="e.g. 4.5" />
@@ -157,23 +184,32 @@
               What emails or insights did they identify?
               <textarea name="task3Finding" rows="4" placeholder="Summary of email correspondence and learnings"></textarea>
             </label>
-            <label>
-              Did they understand sender/receiver info?
-              <select name="task3MetadataUnderstanding">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="Somewhat">Somewhat</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label>
-              Did they notice redactions?
-              <select name="task3Redactions">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
+            <fieldset class="option-group">
+              <legend>Did they understand sender/receiver info?</legend>
+              <label class="option-row">
+                <input type="radio" name="task3MetadataUnderstanding" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task3MetadataUnderstanding" value="Somewhat" />
+                <span>Somewhat</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task3MetadataUnderstanding" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Did they notice redactions?</legend>
+              <label class="option-row">
+                <input type="radio" name="task3Redactions" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task3Redactions" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
             <label class="full-span">
               Observation notes
               <textarea name="task3Notes" rows="3" placeholder="Did they find the email interface quickly?"></textarea>
@@ -192,16 +228,22 @@
               Participant narrative
               <textarea name="task4Narrative" rows="4" placeholder="What story did they reconstruct from the timeline?"></textarea>
             </label>
-            <label>
-              Did they use day summaries?
-              <select name="task4Summaries">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="Somewhat">Somewhat</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label>
+            <fieldset class="option-group">
+              <legend>Did they use day summaries?</legend>
+              <label class="option-row">
+                <input type="radio" name="task4Summaries" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task4Summaries" value="Somewhat" />
+                <span>Somewhat</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task4Summaries" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
+            <label class="full-span">
               Helpfulness of timeline
               <div class="range-control">
                 <div class="range-meta">
@@ -209,6 +251,10 @@
                   <strong data-range-output="task4Helpfulness">3/5</strong>
                 </div>
                 <input type="range" min="1" max="5" value="3" name="task4Helpfulness" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not helpful at all</span>
+                  <span>5 Very helpful</span>
+                </div>
               </div>
             </label>
             <label class="full-span">
@@ -229,23 +275,32 @@
               Participant answer
               <textarea name="task5Response" rows="4" placeholder="What kind of document was it and what did it contain?"></textarea>
             </label>
-            <label>
-              Did they understand the document type label?
-              <select name="task5LabelUnderstanding">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="Somewhat">Somewhat</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label>
-              Did they use the original source link?
-              <select name="task5SourceLink">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
+            <fieldset class="option-group">
+              <legend>Did they understand the document type label?</legend>
+              <label class="option-row">
+                <input type="radio" name="task5LabelUnderstanding" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task5LabelUnderstanding" value="Somewhat" />
+                <span>Somewhat</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task5LabelUnderstanding" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Did they use the original source link?</legend>
+              <label class="option-row">
+                <input type="radio" name="task5SourceLink" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task5SourceLink" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
             <label class="full-span">
               Observation notes
               <textarea name="task5Notes" rows="3" placeholder="Did they navigate to other documents smoothly?"></textarea>
@@ -264,14 +319,17 @@
               Participant answer
               <textarea name="task6Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
             </label>
-            <label>
-              Did they find redaction statistics?
-              <select name="task6Stats">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
+            <fieldset class="option-group">
+              <legend>Did they find redaction statistics?</legend>
+              <label class="option-row">
+                <input type="radio" name="task6Stats" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="task6Stats" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
             <label class="full-span">
               Observation notes
               <textarea name="task6Notes" rows="3" placeholder="Did they connect redactions to political sensitivity?"></textarea>
@@ -310,10 +368,10 @@
               How likely would you recommend this tool for people interested in Woo dossiers?
               <div class="range-control">
                 <div class="range-meta">
-                  <span>1 to 5 score</span>
-                  <strong data-range-output="closingRecommend">3/5</strong>
+                  <span>1 to 10 score</span>
+                  <strong data-range-output="closingRecommend">5/10</strong>
                 </div>
-                <input type="range" min="1" max="5" value="3" name="closingRecommend" />
+                <input type="range" min="1" max="10" value="5" name="closingRecommend" />
               </div>
             </label>
             <label>

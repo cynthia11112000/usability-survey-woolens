@@ -181,6 +181,16 @@ label {
   color: var(--ink);
 }
 
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+}
+
 input,
 select,
 textarea,
@@ -212,6 +222,7 @@ textarea:focus {
 }
 
 input[type="range"] {
+  width: 100%;
   padding: 0;
   accent-color: var(--accent);
   background: transparent;
@@ -220,6 +231,47 @@ input[type="range"] {
 .range-control {
   display: grid;
   gap: 8px;
+}
+
+.range-endpoints {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.option-group {
+  display: grid;
+  gap: 10px;
+}
+
+.option-group legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(30, 42, 42, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.option-row input[type="radio"] {
+  width: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  margin: 0;
+  accent-color: var(--accent);
 }
 
 .range-meta {
@@ -325,6 +377,8 @@ button:hover {
 
 .sus-table input[type="radio"] {
   width: auto;
+  transform: scale(1.45);
+  transform-origin: center;
 }
 
 .login-panel {
@@ -452,6 +506,42 @@ button:hover {
 .bar-chart {
   display: grid;
   gap: 12px;
+}
+
+.dual-bar-chart {
+  display: grid;
+  gap: 14px;
+}
+
+.dual-bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  margin-right: 6px;
+  background: linear-gradient(135deg, #2a5e56, #af3e2d);
+}
+
+.legend-swatch.alt {
+  background: linear-gradient(135deg, #698073, #cf8c5f);
+}
+
+.dual-bar-row {
+  display: grid;
+  gap: 8px;
+}
+
+.dual-bar-tracks {
+  display: grid;
+  gap: 8px;
 }
 
 .bar-row {

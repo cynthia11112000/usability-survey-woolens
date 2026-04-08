@@ -94,16 +94,16 @@ const themeLexicon = {
 };
 
 const susStatements = [
-  "I think I would like to use this tool frequently.",
-  "I found the tool unnecessarily complex.",
-  "I thought the tool was easy to use.",
-  "I think I would need support to use this tool.",
-  "I found the functions well integrated.",
-  "I thought there was too much inconsistency.",
-  "Most people would learn this quickly.",
-  "I found the tool cumbersome to use.",
-  "I felt confident using the tool.",
-  "I needed to learn a lot before I could get going."
+  "I think that I would like to use this system frequently.",
+  "I found the system unnecessarily complex.",
+  "I thought the system was easy to use.",
+  "I think that I would need the support of a technical person to be able to use this system.",
+  "I found the various functions in this system were well integrated.",
+  "I thought there was too much inconsistency in this system.",
+  "I would imagine that most people would learn to use this system very quickly.",
+  "I found the system very cumbersome to use.",
+  "I felt very confident using the system.",
+  "I needed to learn a lot of things before I could get going with this system."
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -231,7 +231,10 @@ function initializeAdminPage() {
 
   document.getElementById("export-json").addEventListener("click", exportResponses);
   document.getElementById("export-csv").addEventListener("click", exportResponsesCsv);
-  document.getElementById("clear-data").addEventListener("click", clearResponses);
+  const clearDataButton = document.getElementById("clear-data");
+  if (clearDataButton) {
+    clearDataButton.addEventListener("click", clearResponses);
+  }
   document.getElementById("responses-list").addEventListener("click", handleResponseActions);
 }
 
@@ -405,7 +408,7 @@ function updateRangeOutput(field) {
     return;
   }
 
-  output.textContent = `${field.value}/5`;
+  output.textContent = `${field.value}/${field.max}`;
 }
 
 function readResponses() {
@@ -781,7 +784,9 @@ function inferFamiliarityScore(value) {
 function renderMetrics(responses) {
   const metricGrid = document.getElementById("metric-grid");
   const susScores = responses.map((response) => Number(response.susScore) || 0);
-  const averageSus = susScores.length ? (susScores.reduce((sum, score) => sum + score, 0) / susScores.length).toFixed(1) : "0.0";
+  const averageSusValue = susScores.length ? susScores.reduce((sum, score) => sum + score, 0) / susScores.length : 0;
+  const averageSus = averageSusValue.toFixed(1);
+  const benchmarkDelta = averageSusValue - 68;
   const averageBackground = responses.length ? average(responses.map((response) => response.backgroundScore)).toFixed(2) : "0.00";
   const completionRate = responses.length
     ? `${Math.round((responses.filter((response) => response.task2Outcome === "Completed").length / responses.length) * 100)}%`
@@ -794,7 +799,13 @@ function renderMetrics(responses) {
 
   const metrics = [
     { label: "Responses", value: responses.length },
-    { label: "Average SUS", value: averageSus },
+    {
+      label: "Average SUS",
+      value: averageSus,
+      detail: benchmarkDelta >= 0
+        ? `${benchmarkDelta.toFixed(1)} above the benchmark of 68`
+        : `${Math.abs(benchmarkDelta).toFixed(1)} below the benchmark of 68`
+    },
     {
       label: "Avg. Background Score",
       value: averageBackground,
@@ -930,10 +941,109 @@ function renderSusSummary(responses) {
 }
 
 function renderVisualCharts(responses) {
-  renderBackgroundSusScatter(responses);
-  renderBackgroundDistribution(responses);
+  renderSusBenchmark(responses);
   renderSusDistribution(responses);
+  renderPerformanceSusScatter(responses);
   renderTaskOutcomeChart(responses);
+  renderTaskTimeChart(responses);
+  renderTaskFrictionChart(responses);
+  renderRedactionUnderstandingChart(responses);
+  renderFeatureUsageHeatmap(responses);
+  renderQualitativeThemeChart(responses);
+}
+
+function renderSusBenchmark(responses) {
+  const container = document.getElementById("sus-benchmark");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("SUS benchmark comparison will appear after the first response.");
+    return;
+  }
+
+  const averageSus = average(responses.map((response) => response.susScore));
+  const benchmark = 68;
+  const delta = averageSus - benchmark;
+
+  container.innerHTML = `
+    <h3>SUS score benchmark</h3>
+    <p class="muted-copy">The headline usability score is compared against the common industry benchmark of 68.</p>
+    ${renderBarChart(
+      [
+        { label: "Study average", value: averageSus, max: 100, displayValue: averageSus.toFixed(1) },
+        { label: "Industry benchmark", value: benchmark, max: 100, displayValue: benchmark.toFixed(0) }
+      ],
+      { decimals: 1 }
+    )}
+    <p class="muted-copy">${escapeHtml(delta >= 0 ? `${delta.toFixed(1)} points above average.` : `${Math.abs(delta).toFixed(1)} points below average.`)}</p>
+  `;
+}
+
+function renderPerformanceSusScatter(responses) {
+  const container = document.getElementById("performance-sus-scatter");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("SUS versus task performance will appear after the first response.");
+    return;
+  }
+
+  const width = 520;
+  const height = 240;
+  const margin = { top: 18, right: 16, bottom: 34, left: 38 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const xTicks = Array.from({ length: taskDefinitions.length + 1 }, (_, index) => index);
+  const yTicks = [0, 20, 40, 60, 80, 100];
+  const points = responses.map((response, index) => ({
+    label: response.participantId || `P${index + 1}`,
+    x: countSuccessfulTasks(response),
+    y: response.susScore || 0,
+    offset: index % 3
+  }));
+
+  const svg = `
+    <svg class="scatter-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Task success count versus SUS scatter plot">
+      ${yTicks
+        .map((tick) => {
+          const y = margin.top + plotHeight - (tick / 100) * plotHeight;
+          return `
+            <line class="grid-line" x1="${margin.left}" y1="${y}" x2="${margin.left + plotWidth}" y2="${y}"></line>
+            <text class="axis-tick" x="${margin.left - 8}" y="${y + 4}" text-anchor="end" font-size="11">${tick}</text>
+          `;
+        })
+        .join("")}
+      ${xTicks
+        .map((tick) => {
+          const x = margin.left + (tick / taskDefinitions.length) * plotWidth;
+          return `
+            <line class="grid-line" x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + plotHeight}"></line>
+            <text class="axis-tick" x="${x}" y="${height - 10}" text-anchor="middle" font-size="11">${tick}</text>
+          `;
+        })
+        .join("")}
+      <line class="axis-line" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}"></line>
+      <line class="axis-line" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}"></line>
+      <text class="axis-label" x="${margin.left + plotWidth / 2}" y="${height}" text-anchor="middle" font-size="12">Tasks completed successfully</text>
+      <text class="axis-label" x="14" y="${margin.top + plotHeight / 2}" text-anchor="middle" transform="rotate(-90 14 ${margin.top + plotHeight / 2})" font-size="12">SUS score</text>
+      ${points
+        .map((point) => {
+          const x = margin.left + (point.x / taskDefinitions.length) * plotWidth;
+          const y = margin.top + plotHeight - (point.y / 100) * plotHeight - point.offset * 6;
+          return `
+            <circle class="point-dot" cx="${x}" cy="${y}" r="6">
+              <title>${escapeHtml(`${point.label}: ${point.x} successful tasks, SUS ${point.y.toFixed(1)}`)}</title>
+            </circle>
+            <text class="point-label" x="${x + 8}" y="${y - 8}" font-size="11">${escapeHtml(point.label)}</text>
+          `;
+        })
+        .join("")}
+    </svg>
+  `;
+
+  container.innerHTML = `
+    <h3>Task difficulty vs. SUS score</h3>
+    <p class="muted-copy">Participants who completed more tasks successfully should trend to the right if perceived usability aligns with task performance.</p>
+    ${svg}
+  `;
 }
 
 function renderBackgroundSusScatter(responses) {
@@ -1075,9 +1185,159 @@ function renderTaskOutcomeChart(responses) {
   });
 
   container.innerHTML = `
-    <h3>Task outcome rates</h3>
+    <h3>Completion rate by task</h3>
     <p class="muted-copy">Share of participants who met the strongest success signal for each task.</p>
     ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderTaskTimeChart(responses) {
+  const container = document.getElementById("task-time-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Task timing metrics will appear after the first response.");
+    return;
+  }
+
+  const timedTaskMap = {
+    task2: "task2Time"
+  };
+  const maxTimedValue = Math.max(
+    1,
+    ...Object.values(timedTaskMap).flatMap((key) => responses.map((response) => Number(response[key])).filter((value) => !Number.isNaN(value)))
+  );
+  const rows = taskDefinitions.map((task) => {
+    const timeKey = timedTaskMap[task.id];
+    if (!timeKey) {
+      return {
+        label: task.title.replace("Task ", "T"),
+        detail: "No timer captured",
+        value: 0,
+        max: maxTimedValue,
+        displayValue: "n/a"
+      };
+    }
+
+    const values = responses.map((response) => Number(response[timeKey])).filter((value) => !Number.isNaN(value));
+    const averageTime = values.length ? average(values) : 0;
+
+    return {
+      label: task.title.replace("Task ", "T"),
+      detail: "Average minutes",
+      value: averageTime,
+      max: maxTimedValue,
+      displayValue: values.length ? `${averageTime.toFixed(1)} min` : "n/a"
+    };
+  });
+
+  container.innerHTML = `
+    <h3>Time on task</h3>
+    <p class="muted-copy">Only tasks with a dedicated timer field contribute a measured duration. At the moment, that is Task 2 only.</p>
+    ${renderBarChart(rows, { decimals: 1 })}
+  `;
+}
+
+function renderTaskFrictionChart(responses) {
+  const container = document.getElementById("task-friction-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Task friction metrics will appear after the first response.");
+    return;
+  }
+
+  const rows = taskDefinitions.map((task) => ({
+    label: task.title.replace("Task ", "T"),
+    detail: "Hesitations/errors proxy",
+    value: responses.filter((response) => hasTaskFriction(task, response)).length,
+    max: responses.length
+  }));
+
+  container.innerHTML = `
+    <h3>Hesitations and errors</h3>
+    <p class="muted-copy">This proxy combines failure states with moderator-note language such as hesitation, confusion, struggle, or mistakes.</p>
+    ${renderBarChart(rows, { integer: true, soft: true })}
+  `;
+}
+
+function renderRedactionUnderstandingChart(responses) {
+  const container = document.getElementById("redaction-understanding-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Redaction understanding metrics will appear after the first response.");
+    return;
+  }
+
+  const rows = [
+    {
+      label: "Found statistics",
+      value: responses.filter((response) => String(response.task6Stats || "") === "Yes").length,
+      max: responses.length
+    },
+    {
+      label: "Understood legal grounds",
+      value: responses.filter(inferLegalGroundsUnderstanding).length,
+      max: responses.length
+    },
+    {
+      label: "Made political connection",
+      value: responses.filter(inferPoliticalConnection).length,
+      max: responses.length
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Redaction understanding</h3>
+    <p class="muted-copy">The first bar uses the explicit Task 6 field. The latter two are proxies inferred from participants' Task 6 responses and observation notes.</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderFeatureUsageHeatmap(responses) {
+  const container = document.getElementById("feature-usage-heatmap");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Feature usage analysis will appear after the first response.");
+    return;
+  }
+
+  container.innerHTML = `
+    <h3>Feature usage heatmap</h3>
+    <p class="muted-copy">Task 7 or open-exploration feature usage is not captured in the current survey, so this dashboard cannot yet show a true usage heatmap.</p>
+    ${emptyState("Add a dedicated open-exploration question or per-feature checklist to visualize spontaneous feature use.")}
+  `;
+}
+
+function renderQualitativeThemeChart(responses) {
+  const container = document.getElementById("qualitative-theme-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Qualitative theme counts will appear after the first response.");
+    return;
+  }
+
+  const usefulThemes = extractThemes(responses.map((response) => response.closingUseful));
+  const confusingThemes = extractThemes(responses.map((response) => response.closingConfusing));
+  const themeCounts = new Map();
+
+  usefulThemes.forEach((theme) => {
+    themeCounts.set(theme.label, { useful: theme.count, confusing: 0 });
+  });
+
+  confusingThemes.forEach((theme) => {
+    const current = themeCounts.get(theme.label) || { useful: 0, confusing: 0 };
+    current.confusing = theme.count;
+    themeCounts.set(theme.label, current);
+  });
+
+  const rows = Array.from(themeCounts.entries())
+    .map(([label, counts]) => ({ label, ...counts }))
+    .sort((left, right) => Math.max(right.useful, right.confusing) - Math.max(left.useful, left.confusing))
+    .slice(0, 6);
+
+  container.innerHTML = `
+    <h3>Qualitative themes</h3>
+    <p class="muted-copy">Frequency comparison of the most common highlight themes versus the most common pain-point themes from the closing questions.</p>
+    ${renderDualBarChart(rows)}
   `;
 }
 
@@ -1394,15 +1654,17 @@ function renderBarChart(rows, options = {}) {
     <div class="bar-chart">
       ${rows
         .map((row) => {
+          const numericValue = Number(row.value || 0);
           const max = row.max || 1;
-          const percentage = Math.min(100, (row.value / max) * 100);
-          const formattedValue = integer ? Math.round(row.value) : Number(row.value || 0).toFixed(decimals);
+          const percentage = Math.min(100, (numericValue / max) * 100);
+          const formattedValue = integer ? Math.round(numericValue) : numericValue.toFixed(decimals);
+          const displayValue = row.displayValue || formattedValue;
 
           return `
             <div class="bar-row">
               <div class="bar-meta">
                 <span>${escapeHtml(row.detail ? `${row.label} - ${row.detail}` : row.label)}</span>
-                <strong>${formattedValue}</strong>
+                <strong>${escapeHtml(displayValue)}</strong>
               </div>
               <div class="bar-track">
                 <span class="bar-fill${soft ? " soft" : ""}" style="width: ${percentage}%"></span>
@@ -1410,6 +1672,37 @@ function renderBarChart(rows, options = {}) {
             </div>
           `;
         })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderDualBarChart(rows) {
+  if (!rows.length) {
+    return emptyState("Not enough qualitative data yet to compare repeated themes.");
+  }
+
+  const maxValue = Math.max(1, ...rows.flatMap((row) => [row.useful, row.confusing]));
+
+  return `
+    <div class="dual-bar-chart">
+      <div class="dual-bar-legend">
+        <span><span class="legend-swatch"></span> Most useful</span>
+        <span><span class="legend-swatch alt"></span> Most confusing</span>
+      </div>
+      ${rows
+        .map((row) => `
+          <div class="dual-bar-row">
+            <div class="bar-meta">
+              <span>${escapeHtml(humanizeTheme(row.label))}</span>
+              <strong>${row.useful} / ${row.confusing}</strong>
+            </div>
+            <div class="dual-bar-tracks">
+              <div class="bar-track"><span class="bar-fill" style="width: ${(row.useful / maxValue) * 100}%"></span></div>
+              <div class="bar-track"><span class="bar-fill soft" style="width: ${(row.confusing / maxValue) * 100}%"></span></div>
+            </div>
+          </div>
+        `)
         .join("")}
     </div>
   `;
@@ -1466,6 +1759,30 @@ function humanizeTheme(value) {
 
 function matchesSuccess(task, value) {
   return task.successValues.includes(typeof value === "string" ? value : Number(value));
+}
+
+function countSuccessfulTasks(response) {
+  return taskDefinitions.filter((task) => matchesSuccess(task, response[task.statusKey])).length;
+}
+
+function hasTaskFriction(task, response) {
+  const text = task.responseKeys.map((key) => response[key]).filter(Boolean).join(" ");
+  const noteSignal = /(hesitat|confus|difficult|hard|struggl|error|mistake|unclear|slow|missed|couldn'?t|could not|unsure|problem)/i.test(text);
+  const statusValue = response[task.statusKey];
+  const hasStatus = statusValue !== undefined && statusValue !== null && statusValue !== "";
+  const failedSuccessSignal = hasStatus && !matchesSuccess(task, statusValue);
+
+  return noteSignal || failedSuccessSignal;
+}
+
+function inferLegalGroundsUnderstanding(response) {
+  const text = `${response.task6Response || ""} ${response.task6Notes || ""}`.toLowerCase();
+  return /(legal grounds?|legal basis|grounds|article|law|section|reason|basis)/.test(text);
+}
+
+function inferPoliticalConnection(response) {
+  const text = `${response.task6Response || ""} ${response.task6Notes || ""}`.toLowerCase();
+  return /(politic|minister|prime minister|government|cabinet|sensitive)/.test(text);
 }
 
 function formatTaskValue(value) {

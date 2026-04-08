@@ -31,9 +31,9 @@
           <h1>Usability Study Dashboard</h1>
         </div>
         <div class="dashboard-actions">
+          <a class="secondary-button" href="./index.html">Back to Survey</a>
           <button id="export-json" class="secondary-button" type="button">Export JSON</button>
           <button id="export-csv" class="secondary-button" type="button">Export CSV</button>
-          <button id="clear-data" class="danger-button" type="button">Clear All Responses</button>
         </div>
       </div>
 
@@ -74,22 +74,38 @@
       <section class="section-card">
         <div>
           <p class="section-kicker">SUS Overview</p>
-          <h2>Statement averages and score profile</h2>
+          <h2>Headline score, benchmark, and item breakdown</h2>
         </div>
-        <div id="sus-chart" class="chart-card chart-block"></div>
+        <div class="chart-grid">
+          <div id="sus-benchmark" class="chart-card chart-block"></div>
+          <div id="sus-distribution" class="chart-card chart-block"></div>
+          <div id="sus-chart" class="chart-card chart-block"></div>
+          <div id="performance-sus-scatter" class="chart-card chart-block"></div>
+        </div>
         <div id="sus-summary" class="sus-summary"></div>
       </section>
 
       <section class="section-card">
         <div>
-          <p class="section-kicker">Visual Analysis</p>
-          <h2>Key comparisons and distributions</h2>
+          <p class="section-kicker">Per-task Metrics</p>
+          <h2>Completion, timing, and friction by task</h2>
         </div>
         <div class="chart-grid">
-          <div id="background-sus-scatter" class="chart-card chart-block"></div>
-          <div id="background-distribution" class="chart-card chart-block"></div>
-          <div id="sus-distribution" class="chart-card chart-block"></div>
           <div id="task-outcome-chart" class="chart-card chart-block"></div>
+          <div id="task-time-chart" class="chart-card chart-block"></div>
+          <div id="task-friction-chart" class="chart-card chart-block"></div>
+          <div id="redaction-understanding-chart" class="chart-card chart-block"></div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">Discovery Patterns</p>
+          <h2>Feature usage and qualitative themes</h2>
+        </div>
+        <div class="chart-grid">
+          <div id="feature-usage-heatmap" class="chart-card chart-block"></div>
+          <div id="qualitative-theme-chart" class="chart-card chart-block"></div>
         </div>
       </section>
 
