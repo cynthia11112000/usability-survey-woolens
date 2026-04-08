@@ -3,10 +3,18 @@ const DASHBOARD_PASSWORD = "woolens";
 const AI_SETTINGS_KEY = "ux-research-openai-settings";
 const AI_INSIGHTS_KEY = "ux-research-openai-insights";
 const DEFAULT_OPENAI_MODEL = "gpt-4.1-mini";
+const SUPABASE_TABLE = "survey_responses";
+const STORAGE_MODE_LOCAL = "local";
+const STORAGE_MODE_SUPABASE = "supabase";
+const SHARED_REFRESH_INTERVAL_MS = 15000;
 const adminState = {
   aiInsights: null,
-  editingResponseId: null
+  editingResponseId: null,
+  refreshTimerId: null,
+  isDashboardUnlocked: false
 };
+let responseCache = [];
+let responsesLoaded = false;
 const comfortScoreMap = {
   "Very uncomfortable": 1,
   "Somewhat uncomfortable": 2,
@@ -116,6 +124,7 @@ function initializeSurveyPage() {
   const form = document.getElementById("survey-form");
   const status = document.getElementById("form-status");
   const sessionDateField = form.elements.sessionDate;
+  const submitButton = form.querySelector('button[type="submit"]');
 
   bindRangeOutputs(form);
 
@@ -123,28 +132,52 @@ function initializeSurveyPage() {
     sessionDateField.value = new Date().toISOString().slice(0, 10);
   }
 
-  form.addEventListener("submit", (event) => {
+  status.textContent = getStorageMode() === STORAGE_MODE_SUPABASE
+    ? "Shared storage is active. Responses will be saved across devices."
+    : "Local-only mode is active. Add Supabase settings in config.js for shared saving.";
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const payload = collectFormData(form);
-    const responses = readResponses();
-    responses.push(payload);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
-
-    status.textContent = `Saved response for ${payload.participantId}.`;
-    status.className = "status-text success";
-    form.reset();
-    if (sessionDateField) {
-      sessionDateField.value = new Date().toISOString().slice(0, 10);
+    if (submitButton) {
+      submitButton.disabled = true;
     }
-    setDefaultRanges(form);
+
+    status.textContent = getStorageMode() === STORAGE_MODE_SUPABASE ? "Saving response to shared storage..." : "Saving response in this browser...";
+    status.className = "status-text";
+
+    try {
+      await saveResponse(payload);
+      status.textContent = getStorageMode() === STORAGE_MODE_SUPABASE
+        ? `Saved response for ${payload.participantId} to shared storage.`
+        : `Saved response for ${payload.participantId} in this browser.`;
+      status.className = "status-text success";
+      form.dataset.preserveStatus = "true";
+      form.reset();
+      if (sessionDateField) {
+        sessionDateField.value = new Date().toISOString().slice(0, 10);
+      }
+      setDefaultRanges(form);
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : "Unable to save the response.";
+      status.className = "status-text error";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+      }
+    }
   });
 
   form.addEventListener("reset", () => {
     window.requestAnimationFrame(() => {
       setDefaultRanges(form);
-      status.textContent = "";
-      status.className = "status-text";
+      if (form.dataset.preserveStatus === "true") {
+        form.dataset.preserveStatus = "false";
+      } else {
+        status.textContent = "";
+        status.className = "status-text";
+      }
       if (sessionDateField) {
         sessionDateField.value = new Date().toISOString().slice(0, 10);
       }
@@ -159,11 +192,13 @@ function initializeAdminPage() {
   const loginStatus = document.getElementById("login-status");
   const loginPanel = document.getElementById("login-panel");
   const dashboardPanel = document.getElementById("dashboard-panel");
+  const storageStatus = document.getElementById("storage-status");
 
   setupAiControls();
   adminState.aiInsights = loadAiInsights();
+  updateStorageStatus(storageStatus);
 
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const password = loginForm.elements.password.value;
 
@@ -175,7 +210,23 @@ function initializeAdminPage() {
 
     loginPanel.classList.add("hidden");
     dashboardPanel.classList.remove("hidden");
-    renderDashboard();
+    adminState.isDashboardUnlocked = true;
+
+    try {
+      updateStorageStatus(storageStatus, "Loading responses...");
+      await hydrateResponses();
+      updateStorageStatus(storageStatus);
+      renderDashboard();
+      startSharedResponsesAutoRefresh(storageStatus);
+    } catch (error) {
+      loginPanel.classList.remove("hidden");
+      dashboardPanel.classList.add("hidden");
+      adminState.isDashboardUnlocked = false;
+      stopSharedResponsesAutoRefresh();
+      loginStatus.textContent = error instanceof Error ? error.message : "Unable to load saved responses.";
+      loginStatus.className = "status-text error";
+      updateStorageStatus(storageStatus);
+    }
   });
 
   document.getElementById("export-json").addEventListener("click", exportResponses);
@@ -358,12 +409,304 @@ function updateRangeOutput(field) {
 }
 
 function readResponses() {
+  if (responsesLoaded) {
+    return responseCache.slice();
+  }
+
+  if (getStorageMode() === STORAGE_MODE_LOCAL) {
+    return readLocalResponses();
+  }
+
+  return [];
+}
+
+function readLocalResponses() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
+}
+
+function writeLocalResponses(responses) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
+  responseCache = responses.slice();
+  responsesLoaded = true;
+}
+
+function getStorageConfig() {
+  const config = typeof window.uxResearchConfig === "object" && window.uxResearchConfig ? window.uxResearchConfig : {};
+  const supabaseUrl = String(config.supabaseUrl || "").trim().replace(/\/$/, "");
+  const supabaseAnonKey = String(config.supabaseAnonKey || "").trim();
+
+  return { supabaseUrl, supabaseAnonKey };
+}
+
+function getStorageMode() {
+  const { supabaseUrl, supabaseAnonKey } = getStorageConfig();
+  return supabaseUrl && supabaseAnonKey ? STORAGE_MODE_SUPABASE : STORAGE_MODE_LOCAL;
+}
+
+function getStorageStatusMessage(overrideMessage = "") {
+  if (overrideMessage) {
+    return overrideMessage;
+  }
+
+  return getStorageMode() === STORAGE_MODE_SUPABASE
+    ? "Shared Supabase storage is active. Dashboard data is loaded from the hosted database and auto-refreshes while open."
+    : "Local-only mode is active. Add Supabase settings in config.js to share responses across devices.";
+}
+
+function updateStorageStatus(element, overrideMessage = "") {
+  if (!element) {
+    return;
+  }
+
+  element.textContent = getStorageStatusMessage(overrideMessage);
+  element.className = "status-text";
+}
+
+async function hydrateResponses() {
+  responseCache = getStorageMode() === STORAGE_MODE_SUPABASE ? await loadSupabaseResponses() : readLocalResponses();
+  responsesLoaded = true;
+  return responseCache.slice();
+}
+
+function startSharedResponsesAutoRefresh(statusElement) {
+  stopSharedResponsesAutoRefresh();
+
+  if (getStorageMode() !== STORAGE_MODE_SUPABASE) {
+    return;
+  }
+
+  adminState.refreshTimerId = window.setInterval(() => {
+    void refreshSharedResponses(statusElement);
+  }, SHARED_REFRESH_INTERVAL_MS);
+}
+
+function stopSharedResponsesAutoRefresh() {
+  if (adminState.refreshTimerId) {
+    window.clearInterval(adminState.refreshTimerId);
+    adminState.refreshTimerId = null;
+  }
+}
+
+async function refreshSharedResponses(statusElement) {
+  if (!adminState.isDashboardUnlocked || getStorageMode() !== STORAGE_MODE_SUPABASE) {
+    stopSharedResponsesAutoRefresh();
+    return;
+  }
+
+  if (adminState.editingResponseId) {
+    return;
+  }
+
+  const previousFingerprint = buildResponsesFingerprint(readResponses().map(normalizeResponse));
+
+  try {
+    const nextResponses = await loadSupabaseResponses();
+    responseCache = nextResponses;
+    responsesLoaded = true;
+    updateStorageStatus(statusElement);
+
+    const nextFingerprint = buildResponsesFingerprint(nextResponses.map(normalizeResponse));
+    if (nextFingerprint !== previousFingerprint) {
+      renderDashboard();
+    }
+  } catch (error) {
+    updateStorageStatus(statusElement, error instanceof Error ? error.message : "Unable to refresh shared responses.");
+  }
+}
+
+async function saveResponse(response) {
+  const payload = { ...response };
+
+  if (getStorageMode() === STORAGE_MODE_SUPABASE) {
+    const saved = await createSupabaseResponse(payload);
+    if (responsesLoaded) {
+      responseCache = responseCache.concat(saved);
+    }
+    clearAiInsightsCache();
+    return saved;
+  }
+
+  const responses = readLocalResponses();
+  responses.push(payload);
+  writeLocalResponses(responses);
+  clearAiInsightsCache();
+  return payload;
+}
+
+async function updateStoredResponse(responseId, updates) {
+  const responses = readResponses();
+  const target = responses.find((response) => getResponseRecordId(response) === responseId);
+
+  if (!target) {
+    throw new Error("Response not found.");
+  }
+
+  const nextResponse = {
+    ...target,
+    ...updates
+  };
+
+  if (getStorageMode() === STORAGE_MODE_SUPABASE) {
+    const saved = await updateSupabaseResponse(responseId, nextResponse);
+    responseCache = responses.map((response) => (getResponseRecordId(response) === responseId ? saved : response));
+    responsesLoaded = true;
+    clearAiInsightsCache();
+    return saved;
+  }
+
+  const nextResponses = responses.map((response) => (getResponseRecordId(response) === responseId ? nextResponse : response));
+  writeLocalResponses(nextResponses);
+  clearAiInsightsCache();
+  return nextResponse;
+}
+
+async function deleteStoredResponse(responseId) {
+  if (getStorageMode() === STORAGE_MODE_SUPABASE) {
+    await deleteSupabaseResponse(responseId);
+    responseCache = readResponses().filter((response) => getResponseRecordId(response) !== responseId);
+    responsesLoaded = true;
+    clearAiInsightsCache();
+    return;
+  }
+
+  const nextResponses = readResponses().filter((response) => getResponseRecordId(response) !== responseId);
+  writeLocalResponses(nextResponses);
+  clearAiInsightsCache();
+}
+
+async function clearStoredResponses() {
+  if (getStorageMode() === STORAGE_MODE_SUPABASE) {
+    await deleteAllSupabaseResponses();
+    responseCache = [];
+    responsesLoaded = true;
+    clearAiInsightsCache();
+    return;
+  }
+
+  localStorage.removeItem(STORAGE_KEY);
+  responseCache = [];
+  responsesLoaded = true;
+  clearAiInsightsCache();
+}
+
+function clearAiInsightsCache() {
+  localStorage.removeItem(AI_INSIGHTS_KEY);
+  adminState.aiInsights = null;
+}
+
+function getSupabaseBaseUrl() {
+  const { supabaseUrl } = getStorageConfig();
+  return `${supabaseUrl}/rest/v1`;
+}
+
+function buildSupabaseHeaders(prefer = "") {
+  const { supabaseAnonKey } = getStorageConfig();
+  const headers = {
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${supabaseAnonKey}`,
+    "Content-Type": "application/json"
+  };
+
+  if (prefer) {
+    headers.Prefer = prefer;
+  }
+
+  return headers;
+}
+
+async function supabaseRequest(path, options = {}) {
+  const response = await fetch(`${getSupabaseBaseUrl()}/${path}`, {
+    ...options,
+    headers: {
+      ...buildSupabaseHeaders(options.prefer || ""),
+      ...(options.headers || {})
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase request failed: ${response.status} ${errorText}`);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
+
+function serializeResponseForStorage(response) {
+  const payload = { ...response };
+  delete payload.remoteId;
+  delete payload.responseId;
+  delete payload.familiarityScore;
+  delete payload.comfortScore;
+  delete payload.backgroundScore;
+
+  return {
+    submitted_at: payload.submittedAt || null,
+    participant_id: payload.participantId || null,
+    session_date: payload.sessionDate || null,
+    researcher_name: payload.researcherName || null,
+    payload
+  };
+}
+
+function mapSupabaseRow(row) {
+  const payload = row?.payload && typeof row.payload === "object" ? row.payload : {};
+  return {
+    ...payload,
+    submittedAt: payload.submittedAt || row.submitted_at || "",
+    participantId: payload.participantId || row.participant_id || "",
+    sessionDate: payload.sessionDate || row.session_date || "",
+    researcherName: payload.researcherName || row.researcher_name || "",
+    remoteId: row.id
+  };
+}
+
+async function loadSupabaseResponses() {
+  const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=id,submitted_at,participant_id,session_date,researcher_name,payload,created_at&order=created_at.asc`, {
+    method: "GET"
+  });
+
+  return Array.isArray(rows) ? rows.map(mapSupabaseRow) : [];
+}
+
+async function createSupabaseResponse(response) {
+  const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=id,submitted_at,participant_id,session_date,researcher_name,payload`, {
+    method: "POST",
+    prefer: "return=representation",
+    body: JSON.stringify(serializeResponseForStorage(response))
+  });
+
+  return mapSupabaseRow(Array.isArray(rows) ? rows[0] : rows);
+}
+
+async function updateSupabaseResponse(responseId, response) {
+  const rows = await supabaseRequest(`${SUPABASE_TABLE}?id=eq.${encodeURIComponent(responseId)}&select=id,submitted_at,participant_id,session_date,researcher_name,payload`, {
+    method: "PATCH",
+    prefer: "return=representation",
+    body: JSON.stringify(serializeResponseForStorage(response))
+  });
+
+  return mapSupabaseRow(Array.isArray(rows) ? rows[0] : rows);
+}
+
+async function deleteSupabaseResponse(responseId) {
+  await supabaseRequest(`${SUPABASE_TABLE}?id=eq.${encodeURIComponent(responseId)}`, {
+    method: "DELETE"
+  });
+}
+
+async function deleteAllSupabaseResponses() {
+  await supabaseRequest(`${SUPABASE_TABLE}?id=not.is.null`, {
+    method: "DELETE"
+  });
 }
 
 function renderDashboard() {
@@ -404,7 +747,7 @@ function normalizeResponse(response) {
 
   return {
     ...response,
-    responseId: buildResponseId(response),
+    responseId: getResponseRecordId(response),
     familiarityScore,
     comfortScore,
     backgroundScore,
@@ -898,16 +1241,16 @@ function handleResponseActions(event) {
   }
 
   if (button.dataset.action === "save-participant-name") {
-    saveParticipantName(responseId, button);
+    void saveParticipantName(responseId, button);
     return;
   }
 
   if (button.dataset.action === "delete-response") {
-    deleteSingleResponse(responseId);
+    void deleteSingleResponse(responseId);
   }
 }
 
-function saveParticipantName(responseId, button) {
+async function saveParticipantName(responseId, button) {
   const card = button.closest(".response-card");
   const input = card?.querySelector("[data-role='participant-name-input']");
   if (!input) {
@@ -915,23 +1258,27 @@ function saveParticipantName(responseId, button) {
   }
 
   const responses = readResponses();
-  const target = responses.find((response) => buildResponseId(response) === responseId);
+  const target = responses.find((response) => getResponseRecordId(response) === responseId);
 
   if (!target) {
     return;
   }
 
-  target.participantId = input.value.trim() || "Unnamed participant";
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
-  localStorage.removeItem(AI_INSIGHTS_KEY);
-  adminState.aiInsights = null;
-  adminState.editingResponseId = null;
-  renderDashboard();
+  try {
+    await updateStoredResponse(responseId, {
+      ...target,
+      participantId: input.value.trim() || "Unnamed participant"
+    });
+    adminState.editingResponseId = null;
+    renderDashboard();
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : "Unable to save the participant name.");
+  }
 }
 
-function deleteSingleResponse(responseId) {
+async function deleteSingleResponse(responseId) {
   const responses = readResponses();
-  const target = responses.find((response) => buildResponseId(response) === responseId);
+  const target = responses.find((response) => getResponseRecordId(response) === responseId);
   const label = target?.participantId || "this submission";
   const confirmed = window.confirm(`Delete saved score for ${label}?`);
 
@@ -939,12 +1286,13 @@ function deleteSingleResponse(responseId) {
     return;
   }
 
-  const nextResponses = responses.filter((response) => buildResponseId(response) !== responseId);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(nextResponses));
-  localStorage.removeItem(AI_INSIGHTS_KEY);
-  adminState.aiInsights = null;
-  adminState.editingResponseId = null;
-  renderDashboard();
+  try {
+    await deleteStoredResponse(responseId);
+    adminState.editingResponseId = null;
+    renderDashboard();
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : "Unable to delete the response.");
+  }
 }
 
 function renderParticipantNameEditor(response) {
@@ -1021,16 +1369,22 @@ function flattenResponseForCsv(response) {
   return flattened;
 }
 
-function clearResponses() {
-  const confirmed = window.confirm("Delete all stored survey responses from this browser?");
+async function clearResponses() {
+  const confirmed = window.confirm(
+    getStorageMode() === STORAGE_MODE_SUPABASE
+      ? "Delete all stored survey responses from shared storage?"
+      : "Delete all stored survey responses from this browser?"
+  );
   if (!confirmed) {
     return;
   }
 
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(AI_INSIGHTS_KEY);
-  adminState.aiInsights = null;
-  renderDashboard();
+  try {
+    await clearStoredResponses();
+    renderDashboard();
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : "Unable to clear responses.");
+  }
 }
 
 function renderBarChart(rows, options = {}) {
@@ -1185,6 +1539,10 @@ function buildResponseId(response) {
   return [response.submittedAt || "", response.participantId || "", response.sessionDate || "", response.researcherName || ""]
     .join("|")
     .replaceAll('"', "");
+}
+
+function getResponseRecordId(response) {
+  return response.remoteId || buildResponseId(response);
 }
 
 async function generateOpenAiInsights(responses, { apiKey, model }) {

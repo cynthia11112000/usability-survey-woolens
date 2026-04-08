@@ -8,6 +8,8 @@ Lightweight static survey and dashboard for moderated usability sessions.
 - `admin.html` - password-protected dashboard for viewing stored responses
 - `styles.css` - shared styling for survey and dashboard
 - `app.js` - localStorage persistence, SUS scoring, analysis, and export tools
+- `config.js` - deployment-level storage settings for local mode or Supabase
+- `supabase/schema.sql` - SQL schema and policies for shared response storage
 - `.github/workflows/deploy-pages.yml` - free GitHub Pages deployment workflow
 
 ## How to use locally
@@ -16,6 +18,8 @@ Lightweight static survey and dashboard for moderated usability sessions.
 2. Fill in the survey during or after a moderated session.
 3. Submit to store the response in the browser's local storage.
 4. Open `admin.html` and enter the password to review results.
+
+If `config.js` contains a Supabase URL and anon key, submissions are stored in Supabase instead and become visible across devices.
 
 ## Dashboard password
 
@@ -42,7 +46,43 @@ Lightweight static survey and dashboard for moderated usability sessions.
 
 ## Important limitation
 
-This is still a static app. Hosting is free, but responses are stored in each browser's local storage, so data is not shared across devices or participants. The dashboard password is also client-side only. For shared research operations, move storage and authentication to a backend service such as Supabase.
+This is still a static app. If `config.js` is left empty, responses are stored in each browser's local storage, so data is not shared across devices or participants. If you configure Supabase, submissions are shared across devices, but the dashboard password is still client-side only. For real admin security, move authentication and privileged actions to a backend service.
+
+## Shared storage setup with Supabase
+
+1. Create a Supabase project.
+2. In the Supabase SQL editor, run the script in `supabase/schema.sql`.
+3. In Supabase, open `Project Settings`, then `API`, and copy:
+	 - Project URL
+	 - Project API anon key
+4. For local testing, open `config.js` and set:
+
+```js
+window.uxResearchConfig = {
+	supabaseUrl: "https://YOUR-PROJECT.supabase.co",
+	supabaseAnonKey: "YOUR-ANON-KEY"
+};
+```
+
+5. Redeploy to GitHub Pages.
+
+Once those values are in place, the survey saves to Supabase and the dashboard reads the shared dataset.
+
+## Recommended GitHub Pages setup
+
+If you deploy with GitHub Pages, do not rely on a manually edited checked-in `config.js`. The Pages workflow can build `config.js` from repository secrets so the deployed site keeps using shared Supabase storage.
+
+1. In GitHub, open repository `Settings`, then `Secrets and variables`, then `Actions`.
+2. Add these repository secrets:
+	 - `UX_RESEARCH_SUPABASE_URL`
+	 - `UX_RESEARCH_SUPABASE_ANON_KEY`
+3. Redeploy the site.
+
+If those secrets are present, the workflow overwrites `config.js` during deployment with the correct Supabase values. If they are missing, the site falls back to whatever is committed in `config.js`, which means local-only mode if that file is blank.
+
+## Security note
+
+Because this site is fully static, any browser that loads it also receives the Supabase anon key. That is normal for client-side apps, but it means the current dashboard password should be treated as convenience only, not real access control. If you need protected admin actions, add Supabase Auth or a server/API layer.
 
 ## About the summaries
 

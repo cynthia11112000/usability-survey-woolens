@@ -1,0 +1,63 @@
+name: Deploy static site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    env:
+      UX_RESEARCH_SUPABASE_URL: ${{ secrets.UX_RESEARCH_SUPABASE_URL }}
+      UX_RESEARCH_SUPABASE_ANON_KEY: ${{ secrets.UX_RESEARCH_SUPABASE_ANON_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Inject runtime storage config
+        run: |
+          if [ -n "$UX_RESEARCH_SUPABASE_URL" ] && [ -n "$UX_RESEARCH_SUPABASE_ANON_KEY" ]; then
+            python3 - <<'PY'
+from pathlib import Path
+import json
+import os
+
+config = {
+    "supabaseUrl": os.environ["UX_RESEARCH_SUPABASE_URL"],
+    "supabaseAnonKey": os.environ["UX_RESEARCH_SUPABASE_ANON_KEY"],
+}
+
+Path("config.js").write_text(
+    "window.uxResearchConfig = " + json.dumps(config, indent=2) + ";\n",
+    encoding="utf-8",
+)
+PY
+          else
+            echo "Supabase secrets are not configured; keeping repo config.js as-is."
+          fi
+
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
