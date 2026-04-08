@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Research Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="admin">
+  <div class="admin-shell">
+    <section class="login-panel" id="login-panel">
+      <p class="eyebrow">Protected Dashboard</p>
+      <h1>Research Results</h1>
+      <p class="hero-copy">Enter the dashboard password to review submissions and export the stored data.</p>
+      <form id="login-form" class="login-form">
+        <label>
+          Password
+          <input type="password" name="password" placeholder="Enter dashboard password" required />
+        </label>
+        <button type="submit" class="primary-button">Unlock Dashboard</button>
+        <p id="login-status" class="status-text" aria-live="polite"></p>
+      </form>
+      <a class="admin-link" href="./index.html">Back to Survey</a>
+    </section>
+
+    <section class="dashboard-panel hidden" id="dashboard-panel">
+      <div class="dashboard-header">
+        <div>
+          <p class="eyebrow">Admin View</p>
+          <h1>Usability Study Dashboard</h1>
+        </div>
+        <div class="dashboard-actions">
+          <button id="export-json" class="secondary-button" type="button">Export JSON</button>
+          <button id="export-csv" class="secondary-button" type="button">Export CSV</button>
+          <button id="clear-data" class="danger-button" type="button">Clear All Responses</button>
+        </div>
+      </div>
+
+      <div class="metric-grid" id="metric-grid"></div>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">OpenAI Analysis</p>
+          <h2>Optional AI configuration</h2>
+          <p class="prompt">Add an OpenAI API key to generate richer AI summaries directly from the dashboard. Without a key, the dashboard uses the built-in local analysis.</p>
+        </div>
+        <div class="ai-config-grid">
+          <label>
+            OpenAI API Key
+            <input id="openai-api-key" type="password" placeholder="sk-..." autocomplete="off" />
+          </label>
+          <label>
+            Model
+            <input id="openai-model" type="text" placeholder="gpt-4.1-mini" />
+          </label>
+        </div>
+        <div class="dashboard-actions ai-actions">
+          <button id="save-openai-settings" class="secondary-button" type="button">Save AI Settings</button>
+          <button id="run-openai-analysis" class="primary-button" type="button">Run OpenAI Analysis</button>
+          <button id="clear-openai-settings" class="secondary-button" type="button">Clear AI Settings</button>
+        </div>
+        <p id="ai-config-status" class="status-text" aria-live="polite"></p>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">Automated Synthesis</p>
+          <h2>Overall summary, pains, and gains</h2>
+        </div>
+        <div id="ai-summary" class="insight-grid"></div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">SUS Overview</p>
+          <h2>Statement averages and score profile</h2>
+        </div>
+        <div id="sus-chart" class="chart-card chart-block"></div>
+        <div id="sus-summary" class="sus-summary"></div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">Visual Analysis</p>
+          <h2>Key comparisons and distributions</h2>
+        </div>
+        <div class="chart-grid">
+          <div id="background-sus-scatter" class="chart-card chart-block"></div>
+          <div id="background-distribution" class="chart-card chart-block"></div>
+          <div id="sus-distribution" class="chart-card chart-block"></div>
+          <div id="task-outcome-chart" class="chart-card chart-block"></div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">Task Outcomes</p>
+          <h2>What participants struggled with</h2>
+        </div>
+        <div id="task-summary" class="task-summary"></div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">AI Theme Analysis</p>
+          <h2>Task observations by theme</h2>
+        </div>
+        <div id="task-themes" class="task-theme-grid"></div>
+      </section>
+
+      <section class="section-card">
+        <div>
+          <p class="section-kicker">Submissions</p>
+          <h2>Response overview per candidate</h2>
+        </div>
+        <div id="responses-list" class="responses-list"></div>
+      </section>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

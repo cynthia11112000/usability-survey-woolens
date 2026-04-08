@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Research Survey</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="survey">
+  <div class="page-shell">
+    <aside class="hero-panel">
+      <p class="eyebrow">Research Session Kit</p>
+      <h1>Government Dossier Tool Usability Survey</h1>
+      <p class="hero-copy">
+        Capture moderated session notes, task outcomes, SUS scores, and follow-up insights in one place.
+      </p>
+      <div class="hero-card">
+        <h2>Session Flow</h2>
+        <ol>
+          <li>Ask the background questions.</li>
+          <li>Guide the participant through tasks 1-6.</li>
+          <li>Complete the SUS ratings.</li>
+          <li>Capture closing reflections and submit.</li>
+        </ol>
+      </div>
+      <a class="admin-link" href="./admin.html">Open Dashboard</a>
+    </aside>
+
+    <main class="content-panel">
+      <form id="survey-form" class="survey-form">
+        <section class="section-card intro-card">
+          <div>
+            <p class="section-kicker">Study Setup</p>
+            <h2>Session Details</h2>
+          </div>
+          <div class="grid two-up">
+            <label>
+              Participant ID
+              <input type="text" name="participantId" placeholder="P-01" required />
+            </label>
+            <label>
+              Researcher Name
+              <input type="text" name="researcherName" placeholder="Name" required />
+            </label>
+            <label>
+              Session Date
+              <input type="date" name="sessionDate" required />
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Background Questions</p>
+            <h2>Pre-task context</h2>
+          </div>
+          <div class="grid">
+            <label>
+              Prior familiarity with Woo dossiers or government information requests
+              <select name="backgroundWooFamiliarity" required>
+                <option value="">Select a level</option>
+                <option value="Never heard of them">Never heard of them</option>
+                <option value="Heard of them">Heard of them</option>
+                <option value="Some familiarity">Some familiarity</option>
+                <option value="Worked with them directly">Worked with them directly</option>
+              </select>
+            </label>
+            <label>
+              Have you ever heard of a Woo dossier or government information request?
+              <textarea name="backgroundWoo" rows="3" placeholder="Participant answer"></textarea>
+            </label>
+            <label>
+              How comfortable are you with reading official documents or government communication?
+              <select name="backgroundComfort" required>
+                <option value="">Select a level</option>
+                <option value="Very uncomfortable">Very uncomfortable</option>
+                <option value="Somewhat uncomfortable">Somewhat uncomfortable</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Somewhat comfortable">Somewhat comfortable</option>
+                <option value="Very comfortable">Very comfortable</option>
+              </select>
+            </label>
+            <label>
+              Moderator notes
+              <textarea name="backgroundNotes" rows="3" placeholder="Prior familiarity, domain knowledge, tone"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 1</p>
+            <h2>First Impression</h2>
+            <p class="prompt">Take a moment to look at the tool. Without clicking anything yet, tell me what you think this tool does.</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              Participant response
+              <textarea name="task1Response" rows="4" placeholder="What they said"></textarea>
+            </label>
+            <label>
+              Was the purpose clear?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score</span>
+                  <strong data-range-output="task1Clarity">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="task1Clarity" />
+              </div>
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task1Notes" rows="3" placeholder="Did the interface communicate purpose clearly?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 2</p>
+            <h2>Finding Internal Communications</h2>
+            <p class="prompt">A source tells you that Minister Grapperhaus and Prime Minister Rutte were in contact on 19 November 2021 about events in Rotterdam. Find out what they discussed.</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              What did the participant find?
+              <textarea name="task2Finding" rows="4" placeholder="Summary of what they learned"></textarea>
+            </label>
+            <label>
+              Outcome
+              <select name="task2Outcome">
+                <option value="">Select</option>
+                <option value="Completed">Completed</option>
+                <option value="Partially completed">Partially completed</option>
+                <option value="Not completed">Not completed</option>
+              </select>
+            </label>
+            <label>
+              Time taken (minutes)
+              <input type="number" min="0" step="0.5" name="task2Time" placeholder="e.g. 4.5" />
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task2Notes" rows="3" placeholder="Did they find the chat interface? Where did they hesitate?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 3</p>
+            <h2>Email Correspondence</h2>
+            <p class="prompt">You are researching how the Dutch government internally discussed the AVVN resolutions on the conflict between Israel and the Palestinian Territories. Find any email correspondence related to this and tell me what you can learn from it.</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              What emails or insights did they identify?
+              <textarea name="task3Finding" rows="4" placeholder="Summary of email correspondence and learnings"></textarea>
+            </label>
+            <label>
+              Did they understand sender/receiver info?
+              <select name="task3MetadataUnderstanding">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="Somewhat">Somewhat</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label>
+              Did they notice redactions?
+              <select name="task3Redactions">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task3Notes" rows="3" placeholder="Did they find the email interface quickly?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 4</p>
+            <h2>Timeline</h2>
+            <p class="prompt">Open the timeline view of this dossier. Tell me what you see and what you can learn from it. Can you find when the discussion about the Dutch position started and how it developed over time?</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              Participant narrative
+              <textarea name="task4Narrative" rows="4" placeholder="What story did they reconstruct from the timeline?"></textarea>
+            </label>
+            <label>
+              Did they use day summaries?
+              <select name="task4Summaries">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="Somewhat">Somewhat</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label>
+              Helpfulness of timeline
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score</span>
+                  <strong data-range-output="task4Helpfulness">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="task4Helpfulness" />
+              </div>
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task4Notes" rows="3" placeholder="Did they click through to documents? Did the structure make sense?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 5</p>
+            <h2>Document Exploration</h2>
+            <p class="prompt">The dossier also contains the actual position document on the AVVN resolutions. Find it and tell me what kind of document it is and what it contains.</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              Participant answer
+              <textarea name="task5Response" rows="4" placeholder="What kind of document was it and what did it contain?"></textarea>
+            </label>
+            <label>
+              Did they understand the document type label?
+              <select name="task5LabelUnderstanding">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="Somewhat">Somewhat</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label>
+              Did they use the original source link?
+              <select name="task5SourceLink">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task5Notes" rows="3" placeholder="Did they navigate to other documents smoothly?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Task 6</p>
+            <h2>Redaction Analysis</h2>
+            <p class="prompt">Look across this dossier and tell me: what information has been withheld, and under which legal grounds? Does anything strike you as unusual?</p>
+          </div>
+          <div class="grid two-up">
+            <label class="full-span">
+              Participant answer
+              <textarea name="task6Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
+            </label>
+            <label>
+              Did they find redaction statistics?
+              <select name="task6Stats">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label class="full-span">
+              Observation notes
+              <textarea name="task6Notes" rows="3" placeholder="Did they connect redactions to political sensitivity?"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">SUS Questionnaire</p>
+            <h2>System Usability Scale</h2>
+            <p class="prompt">Rate each statement from 1 (strongly disagree) to 5 (strongly agree).</p>
+          </div>
+          <div class="sus-grid" id="sus-grid"></div>
+        </section>
+
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Closing Questions</p>
+            <h2>Post-session reflections</h2>
+          </div>
+          <div class="grid">
+            <label>
+              What was the most useful thing you encountered?
+              <textarea name="closingUseful" rows="3"></textarea>
+            </label>
+            <label>
+              What was the most confusing moment?
+              <textarea name="closingConfusing" rows="3"></textarea>
+            </label>
+            <label>
+              Would you use something like this if you were researching a news story or public scandal? Why or why not?
+              <textarea name="closingAdoption" rows="4"></textarea>
+            </label>
+            <label>
+              How likely would you recommend this tool for people interested in Woo dossiers?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score</span>
+                  <strong data-range-output="closingRecommend">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="closingRecommend" />
+              </div>
+            </label>
+            <label>
+              Overall session summary
+              <textarea name="sessionSummary" rows="4" placeholder="Key takeaways, risks, and next steps"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card actions-card">
+          <div>
+            <p class="section-kicker">Submit</p>
+            <h2>Save this session</h2>
+          </div>
+          <div class="actions-row">
+            <button type="submit" class="primary-button">Save Response</button>
+            <button type="reset" class="secondary-button">Clear Form</button>
+            <p id="form-status" class="status-text" aria-live="polite"></p>
+          </div>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
