@@ -21,7 +21,7 @@
           <li>Capture demographics and Woo knowledge score.</li>
           <li>Guide the participant through tasks 1–6.</li>
           <li>Complete the SUS ratings.</li>
-          <li>Fill in Snelwijzer evaluation (Condition C only).</li>
+          <li>Fill in Quick Guide evaluation (Condition C only).</li>
           <li>Capture closing reflections and submit.</li>
         </ol>
       </div>
@@ -50,38 +50,6 @@
               Session Date
               <input type="date" name="sessionDate" required />
             </label>
-          </div>
-          <div class="grid two-up">
-            <fieldset class="option-group">
-              <legend>Condition</legend>
-              <label class="option-row">
-                <input type="radio" name="condition" value="A" />
-                <span>A — Raw PDF</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="condition" value="B" />
-                <span>B — WOOLens without Quick Guide</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="condition" value="C" />
-                <span>C — WOOLens with Quick Guide</span>
-              </label>
-            </fieldset>
-            <fieldset class="option-group">
-              <legend>Phase</legend>
-              <label class="option-row">
-                <input type="radio" name="phase" value="1" />
-                <span>Phase 1</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="phase" value="2" />
-                <span>Phase 2</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="phase" value="3" />
-                <span>Phase 3</span>
-              </label>
-            </fieldset>
           </div>
         </section>
 
@@ -603,16 +571,16 @@
           <div class="sus-grid" id="sus-grid"></div>
         </section>
 
-        <!-- ── Snelwijzer Evaluation (Condition C only) ── -->
+        <!-- ── Quick Guide Evaluation (Condition C only) ── -->
         <section class="section-card">
           <div>
-            <p class="section-kicker">Snelwijzer Evaluation (Condition C only)</p>
+            <p class="section-kicker">Quick Guide Evaluation (Condition C only)</p>
             <h2>Quick Guide Assessment</h2>
             <p class="prompt">Complete this section only for Condition C sessions. Rate each item from 1 (not at all) to 5 (very much).</p>
           </div>
           <div class="grid">
             <label>
-              Did the Snelwijzer help you understand the dossier better?
+              Did the Quick Guide help you understand the dossier better?
               <div class="range-control">
                 <div class="range-meta">
                   <span>1 to 5 score — Perceived usefulness</span>
@@ -626,7 +594,7 @@
               </div>
             </label>
             <label>
-              Was the Snelwijzer easy to read and navigate?
+              Was the Quick Guide easy to read and navigate?
               <div class="range-control">
                 <div class="range-meta">
                   <span>1 to 5 score — Perceived ease of use</span>
@@ -672,7 +640,7 @@
               <textarea name="snelwijzerAgency" rows="3" placeholder="Epistemic agency — participant's own words"></textarea>
             </label>
             <label>
-              Was there anything in the Snelwijzer you disagreed with or did not trust?
+              Was there anything in the Quick Guide you disagreed with or did not trust?
               <textarea name="snelwijzerDisagreement" rows="3" placeholder="Any concerns raised by the participant"></textarea>
             </label>
             <label>
@@ -682,16 +650,16 @@
           </div>
         </section>
 
-        <!-- ── Snelwijzer Researcher Observations (Condition C only) ── -->
+        <!-- ── Quick Guide Researcher Observations (Condition C only) ── -->
         <section class="section-card">
           <div>
-            <p class="section-kicker">Snelwijzer — Researcher Observations (Condition C only)</p>
+            <p class="section-kicker">Quick Guide — Researcher Observations (Condition C only)</p>
             <h2>Researcher notes on Quick Guide use</h2>
-            <p class="prompt">Record what you observe about how the participant interacts with the Snelwijzer.</p>
+            <p class="prompt">Record what you observe about how the participant interacts with the Quick Guide.</p>
           </div>
           <div class="grid two-up">
             <fieldset class="option-group full-span">
-              <legend>Did the participant read the Snelwijzer or immediately close it?</legend>
+              <legend>Did the participant read the Quick Guide or immediately close it?</legend>
               <label class="option-row">
                 <input type="radio" name="snelwijzerInitialBehavior" value="Read" />
                 <span>Read it</span>
@@ -706,11 +674,11 @@
               </label>
             </fieldset>
             <label>
-              Time spent on Snelwijzer before moving to dossier (minutes)
+              Time spent on Quick Guide before moving to dossier (minutes)
               <input type="number" min="0" step="0.25" name="snelwijzerTimeSpent" placeholder="e.g. 1.5" />
             </label>
             <fieldset class="option-group">
-              <legend>Did they refer back to the Snelwijzer during tasks?</legend>
+              <legend>Did they refer back to the Quick Guide during tasks?</legend>
               <label class="option-row">
                 <input type="radio" name="snelwijzerReferBack" value="Yes" />
                 <span>Yes</span>
@@ -749,7 +717,7 @@
             </fieldset>
             <label class="full-span">
               Verbal reactions on first load
-              <textarea name="snelwijzerVerbalReactions" rows="3" placeholder="Any spontaneous verbal reactions when the Snelwijzer first appeared"></textarea>
+              <textarea name="snelwijzerVerbalReactions" rows="3" placeholder="Any spontaneous verbal reactions when the Quick Guide first appeared"></textarea>
             </label>
           </div>
         </section>
@@ -807,7 +775,7 @@
     </main>
   </div>
 
-  <script src="./config.js?v=20260509-1"></script>
-  <script src="./app.js?v=20260509-1"></script>
+  <script src="./config.js?v=20260509-2"></script>
+  <script src="./app.js?v=20260509-2"></script>
 </body>
 </html>
