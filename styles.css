@@ -778,3 +778,36 @@ button:hover {
     display: grid;
   }
 }
+
+/* ── Condition split layout ── */
+.condition-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.condition-block {
+  padding: 16px;
+  border: 1px solid rgba(30, 42, 42, 0.12);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.condition-block .grid {
+  margin-top: 0;
+}
+
+.condition-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  margin: 0 0 14px 0;
+}
+
+@media (max-width: 680px) {
+  .condition-split {
+    grid-template-columns: 1fr;
+  }
+}

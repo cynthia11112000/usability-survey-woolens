@@ -64,7 +64,7 @@
               </label>
               <label class="option-row">
                 <input type="radio" name="condition" value="C" />
-                <span>C — WOOLens with Snelwijzer</span>
+                <span>C — WOOLens with Quick Guide</span>
               </label>
             </fieldset>
             <fieldset class="option-group">
@@ -80,32 +80,6 @@
               <label class="option-row">
                 <input type="radio" name="phase" value="3" />
                 <span>Phase 3</span>
-              </label>
-            </fieldset>
-            <fieldset class="option-group">
-              <legend>Dossier</legend>
-              <label class="option-row">
-                <input type="radio" name="dossier" value="AVVN" />
-                <span>AVVN</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="dossier" value="Gaza" />
-                <span>Gaza</span>
-              </label>
-            </fieldset>
-            <fieldset class="option-group">
-              <legend>Group</legend>
-              <label class="option-row">
-                <input type="radio" name="group" value="Citizen" />
-                <span>Citizen</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="group" value="Journalist" />
-                <span>Journalist</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="group" value="Papiamentu speaker" />
-                <span>Papiamentu speaker</span>
               </label>
             </fieldset>
           </div>
@@ -298,34 +272,71 @@
             <p class="prompt"><strong>Condition A:</strong> "Scroll through the document and find the decision letter. What did the government decide about this request, and how long did it take?"</p>
             <p class="prompt"><strong>Conditions B &amp; C:</strong> "Find the decision letter in this dossier. What did the government decide about this request, and how long did it take?"</p>
           </div>
-          <div class="grid two-up">
-            <label class="full-span">
-              What did they find?
-              <textarea name="task2Finding" rows="4" placeholder="Summary of what they found"></textarea>
-            </label>
-            <fieldset class="option-group">
-              <legend>Outcome</legend>
-              <label class="option-row">
-                <input type="radio" name="task2Outcome" value="Completed" />
-                <span>Completed</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task2Outcome" value="Partially completed" />
-                <span>Partially completed</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task2Outcome" value="Not completed" />
-                <span>Not completed</span>
-              </label>
-            </fieldset>
-            <label>
-              Time taken (minutes)
-              <input type="number" min="0" step="0.5" name="task2Time" placeholder="e.g. 4.5" />
-            </label>
-            <label class="full-span">
-              Observation notes
-              <textarea name="task2Notes" rows="3" placeholder="Where did they navigate? Where did they hesitate?"></textarea>
-            </label>
+          <div class="condition-split">
+            <div class="condition-block">
+              <p class="condition-label">Condition A — Raw PDF</p>
+              <div class="grid">
+                <label>
+                  What did they find?
+                  <textarea name="task2FindingA" rows="4" placeholder="Summary of what they found"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Outcome</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task2OutcomeA" value="Completed" />
+                    <span>Completed</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task2OutcomeA" value="Partially completed" />
+                    <span>Partially completed</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task2OutcomeA" value="Not completed" />
+                    <span>Not completed</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Time taken (minutes)
+                  <input type="number" min="0" step="0.5" name="task2TimeA" placeholder="e.g. 4.5" />
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task2NotesA" rows="3" placeholder="Where did they navigate? Where did they hesitate?"></textarea>
+                </label>
+              </div>
+            </div>
+            <div class="condition-block">
+              <p class="condition-label">Conditions B &amp; C — WOOLens</p>
+              <div class="grid">
+                <label>
+                  What did they find?
+                  <textarea name="task2Finding" rows="4" placeholder="Summary of what they found"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Outcome</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task2Outcome" value="Completed" />
+                    <span>Completed</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task2Outcome" value="Partially completed" />
+                    <span>Partially completed</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task2Outcome" value="Not completed" />
+                    <span>Not completed</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Time taken (minutes)
+                  <input type="number" min="0" step="0.5" name="task2Time" placeholder="e.g. 4.5" />
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task2Notes" rows="3" placeholder="Where did they navigate? Where did they hesitate?"></textarea>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -337,41 +348,85 @@
             <p class="prompt"><strong>Condition A:</strong> "Scroll through the document and find any emails or messages about the Dutch position on the AVVN vote. What can you learn from them?"</p>
             <p class="prompt"><strong>Conditions B &amp; C:</strong> "Find the email or chat correspondence about the Dutch position on the AVVN vote. What can you learn from it?"</p>
           </div>
-          <div class="grid two-up">
-            <label class="full-span">
-              What emails or insights did they identify?
-              <textarea name="task3Finding" rows="4" placeholder="Summary of email correspondence and learnings"></textarea>
-            </label>
-            <fieldset class="option-group">
-              <legend>Did they understand sender/receiver info?</legend>
-              <label class="option-row">
-                <input type="radio" name="task3MetadataUnderstanding" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task3MetadataUnderstanding" value="Somewhat" />
-                <span>Somewhat</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task3MetadataUnderstanding" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
-            <fieldset class="option-group">
-              <legend>Did they notice redactions?</legend>
-              <label class="option-row">
-                <input type="radio" name="task3Redactions" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task3Redactions" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
-            <label class="full-span">
-              Observation notes
-              <textarea name="task3Notes" rows="3" placeholder="Did they find the correspondence quickly?"></textarea>
-            </label>
+          <div class="condition-split">
+            <div class="condition-block">
+              <p class="condition-label">Condition A — Raw PDF</p>
+              <div class="grid">
+                <label>
+                  What emails or insights did they identify?
+                  <textarea name="task3FindingA" rows="4" placeholder="Summary of email correspondence and learnings"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Did they understand sender/receiver info?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstandingA" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstandingA" value="Somewhat" />
+                    <span>Somewhat</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstandingA" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <fieldset class="option-group">
+                  <legend>Did they notice redactions?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task3RedactionsA" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3RedactionsA" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Observation notes
+                  <textarea name="task3NotesA" rows="3" placeholder="Did they find the correspondence quickly?"></textarea>
+                </label>
+              </div>
+            </div>
+            <div class="condition-block">
+              <p class="condition-label">Conditions B &amp; C — WOOLens</p>
+              <div class="grid">
+                <label>
+                  What emails or insights did they identify?
+                  <textarea name="task3Finding" rows="4" placeholder="Summary of email correspondence and learnings"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Did they understand sender/receiver info?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstanding" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstanding" value="Somewhat" />
+                    <span>Somewhat</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3MetadataUnderstanding" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <fieldset class="option-group">
+                  <legend>Did they notice redactions?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task3Redactions" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task3Redactions" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Observation notes
+                  <textarea name="task3Notes" rows="3" placeholder="Did they find the correspondence quickly?"></textarea>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -383,29 +438,61 @@
             <p class="prompt"><strong>Condition A:</strong> "Based on what you see, can you reconstruct when the Dutch government started preparing its position on the AVVN resolutions and how it developed?"</p>
             <p class="prompt"><strong>Conditions B &amp; C:</strong> "Open the timeline view. When did the Dutch government start preparing its position on the AVVN resolutions and how did it develop?"</p>
           </div>
-          <div class="grid two-up">
-            <label class="full-span">
-              Participant narrative
-              <textarea name="task4Narrative" rows="4" placeholder="What story did they reconstruct from the timeline?"></textarea>
-            </label>
-            <label class="full-span">
-              Helpfulness of timeline
-              <div class="range-control">
-                <div class="range-meta">
-                  <span>1 to 5 score</span>
-                  <strong data-range-output="task4Helpfulness">3/5</strong>
-                </div>
-                <input type="range" min="1" max="5" value="3" name="task4Helpfulness" />
-                <div class="range-endpoints" aria-hidden="true">
-                  <span>1 Not helpful at all</span>
-                  <span>5 Very helpful</span>
-                </div>
+          <div class="condition-split">
+            <div class="condition-block">
+              <p class="condition-label">Condition A — Raw PDF</p>
+              <div class="grid">
+                <label>
+                  Participant narrative
+                  <textarea name="task4NarrativeA" rows="4" placeholder="What story did they reconstruct from the documents?"></textarea>
+                </label>
+                <label>
+                  How helpful was the document for reconstructing chronology?
+                  <div class="range-control">
+                    <div class="range-meta">
+                      <span>1 to 5 score</span>
+                      <strong data-range-output="task4HelpfulnessA">3/5</strong>
+                    </div>
+                    <input type="range" min="1" max="5" value="3" name="task4HelpfulnessA" />
+                    <div class="range-endpoints" aria-hidden="true">
+                      <span>1 Not helpful at all</span>
+                      <span>5 Very helpful</span>
+                    </div>
+                  </div>
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task4NotesA" rows="3" placeholder="Did they struggle to piece together the timeline? Where did they hesitate?"></textarea>
+                </label>
               </div>
-            </label>
-            <label class="full-span">
-              Observation notes
-              <textarea name="task4Notes" rows="3" placeholder="Did they navigate through the timeline? Where did they struggle?"></textarea>
-            </label>
+            </div>
+            <div class="condition-block">
+              <p class="condition-label">Conditions B &amp; C — WOOLens</p>
+              <div class="grid">
+                <label>
+                  Participant narrative
+                  <textarea name="task4Narrative" rows="4" placeholder="What story did they reconstruct from the timeline?"></textarea>
+                </label>
+                <label>
+                  Helpfulness of timeline view
+                  <div class="range-control">
+                    <div class="range-meta">
+                      <span>1 to 5 score</span>
+                      <strong data-range-output="task4Helpfulness">3/5</strong>
+                    </div>
+                    <input type="range" min="1" max="5" value="3" name="task4Helpfulness" />
+                    <div class="range-endpoints" aria-hidden="true">
+                      <span>1 Not helpful at all</span>
+                      <span>5 Very helpful</span>
+                    </div>
+                  </div>
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task4Notes" rows="3" placeholder="Did they navigate through the timeline? Where did they struggle?"></textarea>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -417,26 +504,55 @@
             <p class="prompt"><strong>Condition A:</strong> "Look through the document and find blacked-out sections. What information has been withheld, and can you find a reason why?"</p>
             <p class="prompt"><strong>Conditions B &amp; C:</strong> "Look at the redaction information in this dossier. What has been withheld and under which legal grounds? Does anything strike you as unusual?"</p>
           </div>
-          <div class="grid two-up">
-            <label class="full-span">
-              Participant answer
-              <textarea name="task5Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
-            </label>
-            <fieldset class="option-group">
-              <legend>Did they find redaction information?</legend>
-              <label class="option-row">
-                <input type="radio" name="task5RedactionInfo" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task5RedactionInfo" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
-            <label class="full-span">
-              Observation notes
-              <textarea name="task5Notes" rows="3" placeholder="Did they connect redactions to legal grounds or political sensitivity?"></textarea>
-            </label>
+          <div class="condition-split">
+            <div class="condition-block">
+              <p class="condition-label">Condition A — Raw PDF</p>
+              <div class="grid">
+                <label>
+                  Participant answer
+                  <textarea name="task5ResponseA" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Did they find redaction information?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task5RedactionInfoA" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task5RedactionInfoA" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Observation notes
+                  <textarea name="task5NotesA" rows="3" placeholder="Did they connect redactions to legal grounds or political sensitivity?"></textarea>
+                </label>
+              </div>
+            </div>
+            <div class="condition-block">
+              <p class="condition-label">Conditions B &amp; C — WOOLens</p>
+              <div class="grid">
+                <label>
+                  Participant answer
+                  <textarea name="task5Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
+                </label>
+                <fieldset class="option-group">
+                  <legend>Did they find redaction information?</legend>
+                  <label class="option-row">
+                    <input type="radio" name="task5RedactionInfo" value="Yes" />
+                    <span>Yes</span>
+                  </label>
+                  <label class="option-row">
+                    <input type="radio" name="task5RedactionInfo" value="No" />
+                    <span>No</span>
+                  </label>
+                </fieldset>
+                <label>
+                  Observation notes
+                  <textarea name="task5Notes" rows="3" placeholder="Did they connect redactions to legal grounds or political sensitivity?"></textarea>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -447,15 +563,33 @@
             <h2>Overall Understanding</h2>
             <p class="prompt">"Now that you have looked through this dossier — what do you think this request was really about? What was the person who filed it trying to find out?"</p>
           </div>
-          <div class="grid two-up">
-            <label class="full-span">
-              Participant answer
-              <textarea name="task6Response" rows="4" placeholder="What did they understand the request to be about?"></textarea>
-            </label>
-            <label class="full-span">
-              Observation notes
-              <textarea name="task6Notes" rows="3" placeholder="Did they grasp the purpose and context of the dossier?"></textarea>
-            </label>
+          <div class="condition-split">
+            <div class="condition-block">
+              <p class="condition-label">Condition A — Raw PDF</p>
+              <div class="grid">
+                <label>
+                  Participant answer
+                  <textarea name="task6ResponseA" rows="4" placeholder="What did they understand the request to be about?"></textarea>
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task6NotesA" rows="3" placeholder="Did they grasp the purpose and context of the dossier?"></textarea>
+                </label>
+              </div>
+            </div>
+            <div class="condition-block">
+              <p class="condition-label">Conditions B &amp; C — WOOLens</p>
+              <div class="grid">
+                <label>
+                  Participant answer
+                  <textarea name="task6Response" rows="4" placeholder="What did they understand the request to be about?"></textarea>
+                </label>
+                <label>
+                  Observation notes
+                  <textarea name="task6Notes" rows="3" placeholder="Did they grasp the purpose and context of the dossier?"></textarea>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 

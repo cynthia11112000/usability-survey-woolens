@@ -34,7 +34,7 @@ const taskDefinitions = [
   {
     id: "task2",
     title: "Task 2: Decision letter",
-    responseKeys: ["task2Finding", "task2Notes"],
+    responseKeys: ["task2Finding", "task2Notes", "task2FindingA", "task2NotesA"],
     statusKey: "task2Outcome",
     statusLabel: "Completed",
     successValues: ["Completed"]
@@ -42,7 +42,7 @@ const taskDefinitions = [
   {
     id: "task3",
     title: "Task 3: Internal communications",
-    responseKeys: ["task3Finding", "task3Notes"],
+    responseKeys: ["task3Finding", "task3Notes", "task3FindingA", "task3NotesA"],
     statusKey: "task3MetadataUnderstanding",
     statusLabel: "Metadata understood",
     successValues: ["Yes"]
@@ -50,7 +50,7 @@ const taskDefinitions = [
   {
     id: "task4",
     title: "Task 4: Chronology",
-    responseKeys: ["task4Narrative", "task4Notes"],
+    responseKeys: ["task4Narrative", "task4Notes", "task4NarrativeA", "task4NotesA"],
     statusKey: "task4Helpfulness",
     statusLabel: "Helpfulness score 4-5",
     successValues: [4, 5]
@@ -58,7 +58,7 @@ const taskDefinitions = [
   {
     id: "task5",
     title: "Task 5: Redactions",
-    responseKeys: ["task5Response", "task5Notes"],
+    responseKeys: ["task5Response", "task5Notes", "task5ResponseA", "task5NotesA"],
     statusKey: "task5RedactionInfo",
     statusLabel: "Redaction info found",
     successValues: ["Yes"]
@@ -66,7 +66,7 @@ const taskDefinitions = [
   {
     id: "task6",
     title: "Task 6: Overall understanding",
-    responseKeys: ["task6Response", "task6Notes"],
+    responseKeys: ["task6Response", "task6Notes", "task6ResponseA", "task6NotesA"],
     statusKey: "task6Response",
     statusLabel: "Response recorded",
     successValues: []
