@@ -264,7 +264,8 @@ input[type="range"] {
   font-weight: 500;
 }
 
-.option-row input[type="radio"] {
+.option-row input[type="radio"],
+.option-row input[type="checkbox"] {
   width: auto;
   padding: 0;
   border: 0;

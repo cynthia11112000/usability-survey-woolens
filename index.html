@@ -17,9 +17,11 @@
       <div class="hero-card">
         <h2>Session Flow</h2>
         <ol>
-          <li>Ask the background questions.</li>
-          <li>Guide the participant through tasks 1-6.</li>
+          <li>Record session &amp; condition details.</li>
+          <li>Capture demographics and Woo knowledge score.</li>
+          <li>Guide the participant through tasks 1–6.</li>
           <li>Complete the SUS ratings.</li>
+          <li>Fill in Snelwijzer evaluation (Condition C only).</li>
           <li>Capture closing reflections and submit.</li>
         </ol>
       </div>
@@ -28,6 +30,8 @@
 
     <main class="content-panel">
       <form id="survey-form" class="survey-form">
+
+        <!-- ── SECTION 1: Session & Condition Tracking ── -->
         <section class="section-card intro-card">
           <div>
             <p class="section-kicker">Study Setup</p>
@@ -47,68 +51,218 @@
               <input type="date" name="sessionDate" required />
             </label>
           </div>
+          <div class="grid two-up">
+            <fieldset class="option-group">
+              <legend>Condition</legend>
+              <label class="option-row">
+                <input type="radio" name="condition" value="A" />
+                <span>A — Raw PDF</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="condition" value="B" />
+                <span>B — WOOLens without Quick Guide</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="condition" value="C" />
+                <span>C — WOOLens with Snelwijzer</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Phase</legend>
+              <label class="option-row">
+                <input type="radio" name="phase" value="1" />
+                <span>Phase 1</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="phase" value="2" />
+                <span>Phase 2</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="phase" value="3" />
+                <span>Phase 3</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Dossier</legend>
+              <label class="option-row">
+                <input type="radio" name="dossier" value="AVVN" />
+                <span>AVVN</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="dossier" value="Gaza" />
+                <span>Gaza</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Group</legend>
+              <label class="option-row">
+                <input type="radio" name="group" value="Citizen" />
+                <span>Citizen</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="group" value="Journalist" />
+                <span>Journalist</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="group" value="Papiamentu speaker" />
+                <span>Papiamentu speaker</span>
+              </label>
+            </fieldset>
+          </div>
         </section>
 
+        <!-- ── SECTION 2: Demographics ── -->
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Demographics</p>
+            <h2>Participant background</h2>
+          </div>
+          <div class="grid two-up">
+            <label>
+              Age
+              <input type="number" name="age" min="0" max="120" placeholder="e.g. 34" />
+            </label>
+            <label>
+              Nationality
+              <input type="text" name="nationality" placeholder="e.g. Dutch" />
+            </label>
+            <label>
+              Highest level of education
+              <select name="education">
+                <option value="">Select level</option>
+                <option value="Primary">Primary</option>
+                <option value="Secondary">Secondary</option>
+                <option value="Vocational">Vocational</option>
+                <option value="University of applied sciences">University of applied sciences</option>
+                <option value="Research university">Research university</option>
+              </select>
+            </label>
+            <label>
+              Professional background
+              <textarea name="professionalBackground" rows="3" placeholder="Describe professional background"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ── SECTION 3: Woo Knowledge Score ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Background Questions</p>
-            <h2>Pre-task context</h2>
+            <h2>Woo Knowledge Score</h2>
+            <p class="prompt">Each answer is scored 0–2. Total is out of 10.</p>
           </div>
           <div class="grid">
             <fieldset class="option-group">
-              <legend>Prior familiarity with Woo dossiers or government information requests</legend>
+              <legend>Have you heard of the Dutch Open Government Act (Woo)?</legend>
               <label class="option-row">
-                <input type="radio" name="backgroundWooFamiliarity" value="Never heard of them" required />
-                <span>Never heard of them</span>
+                <input type="radio" name="wooQ1" value="0" />
+                <span>Never (0)</span>
               </label>
               <label class="option-row">
-                <input type="radio" name="backgroundWooFamiliarity" value="Heard of them" />
-                <span>Heard of them</span>
+                <input type="radio" name="wooQ1" value="1" />
+                <span>Vaguely (1)</span>
               </label>
               <label class="option-row">
-                <input type="radio" name="backgroundWooFamiliarity" value="Some familiarity" />
-                <span>Some familiarity</span>
+                <input type="radio" name="wooQ1" value="2" />
+                <span>Yes, know it well (2)</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Have you ever submitted or read a Woo request?</legend>
+              <label class="option-row">
+                <input type="radio" name="wooQ2" value="0" />
+                <span>Never (0)</span>
               </label>
               <label class="option-row">
-                <input type="radio" name="backgroundWooFamiliarity" value="Worked with them directly" />
-                <span>Worked with them directly</span>
+                <input type="radio" name="wooQ2" value="1" />
+                <span>Once or twice (1)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ2" value="2" />
+                <span>Regularly (2)</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Do you know what a decision letter from a Woo request contains?</legend>
+              <label class="option-row">
+                <input type="radio" name="wooQ3" value="0" />
+                <span>No (0)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ3" value="1" />
+                <span>Vague idea (1)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ3" value="2" />
+                <span>Yes, well (2)</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Do you know what a document inventory list is in a Woo dossier?</legend>
+              <label class="option-row">
+                <input type="radio" name="wooQ4" value="0" />
+                <span>No (0)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ4" value="1" />
+                <span>Vague idea (1)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ4" value="2" />
+                <span>Yes, well (2)</span>
+              </label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>Do you know what refusal grounds are in the context of Woo?</legend>
+              <label class="option-row">
+                <input type="radio" name="wooQ5" value="0" />
+                <span>No (0)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ5" value="1" />
+                <span>Vague idea (1)</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="wooQ5" value="2" />
+                <span>Yes, well (2)</span>
               </label>
             </fieldset>
             <label>
-              Have you ever heard of a Woo dossier or government information request?
-              <textarea name="backgroundWoo" rows="3" placeholder="Participant answer"></textarea>
+              Woo knowledge score (auto-calculated, 0–10)
+              <input type="number" name="wooKnowledgeScore" min="0" max="10" placeholder="0 / 10" />
             </label>
             <fieldset class="option-group">
               <legend>How comfortable are you with reading official documents or government communication?</legend>
               <label class="option-row">
-                <input type="radio" name="backgroundComfort" value="Very uncomfortable" required />
-                <span>Very uncomfortable</span>
+                <input type="radio" name="backgroundComfort" value="Very uncomfortable" />
+                <span>Very uncomfortable (1)</span>
               </label>
               <label class="option-row">
                 <input type="radio" name="backgroundComfort" value="Somewhat uncomfortable" />
-                <span>Somewhat uncomfortable</span>
+                <span>Somewhat uncomfortable (2)</span>
               </label>
               <label class="option-row">
                 <input type="radio" name="backgroundComfort" value="Neutral" />
-                <span>Neutral</span>
+                <span>Neutral (3)</span>
               </label>
               <label class="option-row">
                 <input type="radio" name="backgroundComfort" value="Somewhat comfortable" />
-                <span>Somewhat comfortable</span>
+                <span>Somewhat comfortable (4)</span>
               </label>
               <label class="option-row">
                 <input type="radio" name="backgroundComfort" value="Very comfortable" />
-                <span>Very comfortable</span>
+                <span>Very comfortable (5)</span>
               </label>
             </fieldset>
           </div>
         </section>
 
+        <!-- ── TASK 1: First Impression ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 1</p>
             <h2>First Impression</h2>
-            <p class="prompt">Take a moment to look at the tool. Without clicking anything yet, tell me what you think this tool does.</p>
+            <p class="prompt">"Take a moment to look at what is in front of you. Without clicking anything yet, tell me what you think this is about."</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
@@ -136,16 +290,18 @@
           </div>
         </section>
 
+        <!-- ── TASK 2: Decision Letter ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 2</p>
-            <h2>Finding Internal Communications</h2>
-            <p class="prompt">A source tells you that Minister Grapperhaus and Prime Minister Rutte were in contact on 19 November 2021 about events in Rotterdam. Find out what they discussed.</p>
+            <h2>Decision Letter</h2>
+            <p class="prompt"><strong>Condition A:</strong> "Scroll through the document and find the decision letter. What did the government decide about this request, and how long did it take?"</p>
+            <p class="prompt"><strong>Conditions B &amp; C:</strong> "Find the decision letter in this dossier. What did the government decide about this request, and how long did it take?"</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
-              What did the participant find?
-              <textarea name="task2Finding" rows="4" placeholder="Summary of what they learned"></textarea>
+              What did they find?
+              <textarea name="task2Finding" rows="4" placeholder="Summary of what they found"></textarea>
             </label>
             <fieldset class="option-group">
               <legend>Outcome</legend>
@@ -168,16 +324,18 @@
             </label>
             <label class="full-span">
               Observation notes
-              <textarea name="task2Notes" rows="3" placeholder="Did they find the chat interface? Where did they hesitate?"></textarea>
+              <textarea name="task2Notes" rows="3" placeholder="Where did they navigate? Where did they hesitate?"></textarea>
             </label>
           </div>
         </section>
 
+        <!-- ── TASK 3: Internal Communications ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 3</p>
-            <h2>Email Correspondence</h2>
-            <p class="prompt">You are researching how the Dutch government internally discussed the AVVN resolutions on the conflict between Israel and the Palestinian Territories. Find any email correspondence related to this and tell me what you can learn from it.</p>
+            <h2>Internal Communications</h2>
+            <p class="prompt"><strong>Condition A:</strong> "Scroll through the document and find any emails or messages about the Dutch position on the AVVN vote. What can you learn from them?"</p>
+            <p class="prompt"><strong>Conditions B &amp; C:</strong> "Find the email or chat correspondence about the Dutch position on the AVVN vote. What can you learn from it?"</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
@@ -212,37 +370,24 @@
             </fieldset>
             <label class="full-span">
               Observation notes
-              <textarea name="task3Notes" rows="3" placeholder="Did they find the email interface quickly?"></textarea>
+              <textarea name="task3Notes" rows="3" placeholder="Did they find the correspondence quickly?"></textarea>
             </label>
           </div>
         </section>
 
+        <!-- ── TASK 4: Chronology ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 4</p>
-            <h2>Timeline</h2>
-            <p class="prompt">Open the timeline view of this dossier. Tell me what you see and what you can learn from it. Can you find when the discussion about the Dutch position started and how it developed over time?</p>
+            <h2>Chronology</h2>
+            <p class="prompt"><strong>Condition A:</strong> "Based on what you see, can you reconstruct when the Dutch government started preparing its position on the AVVN resolutions and how it developed?"</p>
+            <p class="prompt"><strong>Conditions B &amp; C:</strong> "Open the timeline view. When did the Dutch government start preparing its position on the AVVN resolutions and how did it develop?"</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
               Participant narrative
               <textarea name="task4Narrative" rows="4" placeholder="What story did they reconstruct from the timeline?"></textarea>
             </label>
-            <fieldset class="option-group">
-              <legend>Did they use day summaries?</legend>
-              <label class="option-row">
-                <input type="radio" name="task4Summaries" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task4Summaries" value="Somewhat" />
-                <span>Somewhat</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task4Summaries" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
             <label class="full-span">
               Helpfulness of timeline
               <div class="range-control">
@@ -259,84 +404,62 @@
             </label>
             <label class="full-span">
               Observation notes
-              <textarea name="task4Notes" rows="3" placeholder="Did they click through to documents? Did the structure make sense?"></textarea>
+              <textarea name="task4Notes" rows="3" placeholder="Did they navigate through the timeline? Where did they struggle?"></textarea>
             </label>
           </div>
         </section>
 
+        <!-- ── TASK 5: Redactions ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 5</p>
-            <h2>Document Exploration</h2>
-            <p class="prompt">The dossier also contains the actual position document on the AVVN resolutions. Find it and tell me what kind of document it is and what it contains.</p>
+            <h2>Redactions</h2>
+            <p class="prompt"><strong>Condition A:</strong> "Look through the document and find blacked-out sections. What information has been withheld, and can you find a reason why?"</p>
+            <p class="prompt"><strong>Conditions B &amp; C:</strong> "Look at the redaction information in this dossier. What has been withheld and under which legal grounds? Does anything strike you as unusual?"</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
               Participant answer
-              <textarea name="task5Response" rows="4" placeholder="What kind of document was it and what did it contain?"></textarea>
+              <textarea name="task5Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
             </label>
             <fieldset class="option-group">
-              <legend>Did they understand the document type label?</legend>
+              <legend>Did they find redaction information?</legend>
               <label class="option-row">
-                <input type="radio" name="task5LabelUnderstanding" value="Yes" />
+                <input type="radio" name="task5RedactionInfo" value="Yes" />
                 <span>Yes</span>
               </label>
               <label class="option-row">
-                <input type="radio" name="task5LabelUnderstanding" value="Somewhat" />
-                <span>Somewhat</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task5LabelUnderstanding" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
-            <fieldset class="option-group">
-              <legend>Did they use the original source link?</legend>
-              <label class="option-row">
-                <input type="radio" name="task5SourceLink" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task5SourceLink" value="No" />
+                <input type="radio" name="task5RedactionInfo" value="No" />
                 <span>No</span>
               </label>
             </fieldset>
             <label class="full-span">
               Observation notes
-              <textarea name="task5Notes" rows="3" placeholder="Did they navigate to other documents smoothly?"></textarea>
+              <textarea name="task5Notes" rows="3" placeholder="Did they connect redactions to legal grounds or political sensitivity?"></textarea>
             </label>
           </div>
         </section>
 
+        <!-- ── TASK 6: Overall Understanding ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Task 6</p>
-            <h2>Redaction Analysis</h2>
-            <p class="prompt">Look across this dossier and tell me: what information has been withheld, and under which legal grounds? Does anything strike you as unusual?</p>
+            <h2>Overall Understanding</h2>
+            <p class="prompt">"Now that you have looked through this dossier — what do you think this request was really about? What was the person who filed it trying to find out?"</p>
           </div>
           <div class="grid two-up">
             <label class="full-span">
               Participant answer
-              <textarea name="task6Response" rows="4" placeholder="What was withheld and under which legal grounds?"></textarea>
+              <textarea name="task6Response" rows="4" placeholder="What did they understand the request to be about?"></textarea>
             </label>
-            <fieldset class="option-group">
-              <legend>Did they find redaction statistics?</legend>
-              <label class="option-row">
-                <input type="radio" name="task6Stats" value="Yes" />
-                <span>Yes</span>
-              </label>
-              <label class="option-row">
-                <input type="radio" name="task6Stats" value="No" />
-                <span>No</span>
-              </label>
-            </fieldset>
             <label class="full-span">
               Observation notes
-              <textarea name="task6Notes" rows="3" placeholder="Did they connect redactions to political sensitivity?"></textarea>
+              <textarea name="task6Notes" rows="3" placeholder="Did they grasp the purpose and context of the dossier?"></textarea>
             </label>
           </div>
         </section>
 
+        <!-- ── SUS Questionnaire (unchanged) ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">SUS Questionnaire</p>
@@ -346,6 +469,158 @@
           <div class="sus-grid" id="sus-grid"></div>
         </section>
 
+        <!-- ── Snelwijzer Evaluation (Condition C only) ── -->
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Snelwijzer Evaluation (Condition C only)</p>
+            <h2>Quick Guide Assessment</h2>
+            <p class="prompt">Complete this section only for Condition C sessions. Rate each item from 1 (not at all) to 5 (very much).</p>
+          </div>
+          <div class="grid">
+            <label>
+              Did the Snelwijzer help you understand the dossier better?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score — Perceived usefulness</span>
+                  <strong data-range-output="snelwijzerHelpfulness">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="snelwijzerHelpfulness" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not at all</span>
+                  <span>5 Very much</span>
+                </div>
+              </div>
+            </label>
+            <label>
+              Was the Snelwijzer easy to read and navigate?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score — Perceived ease of use</span>
+                  <strong data-range-output="snelwijzerEaseOfUse">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="snelwijzerEaseOfUse" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not at all</span>
+                  <span>5 Very easy</span>
+                </div>
+              </div>
+            </label>
+            <label>
+              Did you trust the information it showed you?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score — Epistemic trust</span>
+                  <strong data-range-output="snelwijzerTrust">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="snelwijzerTrust" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not at all</span>
+                  <span>5 Fully trusted</span>
+                </div>
+              </div>
+            </label>
+            <label>
+              Did it help you feel more confident about what you were looking at?
+              <div class="range-control">
+                <div class="range-meta">
+                  <span>1 to 5 score — Confidence gain</span>
+                  <strong data-range-output="snelwijzerConfidence">3/5</strong>
+                </div>
+                <input type="range" min="1" max="5" value="3" name="snelwijzerConfidence" />
+                <div class="range-endpoints" aria-hidden="true">
+                  <span>1 Not at all</span>
+                  <span>5 Much more confident</span>
+                </div>
+              </div>
+            </label>
+            <label>
+              Did the explanation feel like your own understanding, or like someone telling you what to think?
+              <textarea name="snelwijzerAgency" rows="3" placeholder="Epistemic agency — participant's own words"></textarea>
+            </label>
+            <label>
+              Was there anything in the Snelwijzer you disagreed with or did not trust?
+              <textarea name="snelwijzerDisagreement" rows="3" placeholder="Any concerns raised by the participant"></textarea>
+            </label>
+            <label>
+              Would you have understood the dossier differently without it?
+              <textarea name="snelwijzerWithout" rows="3" placeholder="Participant's reflection on counterfactual understanding"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ── Snelwijzer Researcher Observations (Condition C only) ── -->
+        <section class="section-card">
+          <div>
+            <p class="section-kicker">Snelwijzer — Researcher Observations (Condition C only)</p>
+            <h2>Researcher notes on Quick Guide use</h2>
+            <p class="prompt">Record what you observe about how the participant interacts with the Snelwijzer.</p>
+          </div>
+          <div class="grid two-up">
+            <fieldset class="option-group full-span">
+              <legend>Did the participant read the Snelwijzer or immediately close it?</legend>
+              <label class="option-row">
+                <input type="radio" name="snelwijzerInitialBehavior" value="Read" />
+                <span>Read it</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="snelwijzerInitialBehavior" value="Skimmed" />
+                <span>Skimmed briefly</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="snelwijzerInitialBehavior" value="Immediately closed" />
+                <span>Immediately closed</span>
+              </label>
+            </fieldset>
+            <label>
+              Time spent on Snelwijzer before moving to dossier (minutes)
+              <input type="number" min="0" step="0.25" name="snelwijzerTimeSpent" placeholder="e.g. 1.5" />
+            </label>
+            <fieldset class="option-group">
+              <legend>Did they refer back to the Snelwijzer during tasks?</legend>
+              <label class="option-row">
+                <input type="radio" name="snelwijzerReferBack" value="Yes" />
+                <span>Yes</span>
+              </label>
+              <label class="option-row">
+                <input type="radio" name="snelwijzerReferBack" value="No" />
+                <span>No</span>
+              </label>
+            </fieldset>
+            <label>
+              Notes on refer-back behaviour
+              <textarea name="snelwijzerReferBackNotes" rows="3" placeholder="When and how did they refer back?"></textarea>
+            </label>
+            <fieldset class="option-group full-span">
+              <legend>Which sections did they expand?</legend>
+              <label class="option-row">
+                <input type="checkbox" name="snelwijzerSectionAbout" value="Yes" />
+                <span>What is this dossier about</span>
+              </label>
+              <label class="option-row">
+                <input type="checkbox" name="snelwijzerSectionGovBody" value="Yes" />
+                <span>Which government body</span>
+              </label>
+              <label class="option-row">
+                <input type="checkbox" name="snelwijzerSectionPublic" value="Yes" />
+                <span>What was made public</span>
+              </label>
+              <label class="option-row">
+                <input type="checkbox" name="snelwijzerSectionWithheld" value="Yes" />
+                <span>Why was information withheld</span>
+              </label>
+              <label class="option-row">
+                <input type="checkbox" name="snelwijzerSectionDecision" value="Yes" />
+                <span>What does this decision mean</span>
+              </label>
+            </fieldset>
+            <label class="full-span">
+              Verbal reactions on first load
+              <textarea name="snelwijzerVerbalReactions" rows="3" placeholder="Any spontaneous verbal reactions when the Snelwijzer first appeared"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ── Closing Questions (unchanged) ── -->
         <section class="section-card">
           <div>
             <p class="section-kicker">Closing Questions</p>
@@ -381,6 +656,7 @@
           </div>
         </section>
 
+        <!-- ── Submit ── -->
         <section class="section-card actions-card">
           <div>
             <p class="section-kicker">Submit</p>
@@ -392,11 +668,12 @@
             <p id="form-status" class="status-text" aria-live="polite"></p>
           </div>
         </section>
+
       </form>
     </main>
   </div>
 
-  <script src="./config.js?v=20260408-1"></script>
-  <script src="./app.js?v=20260408-1"></script>
+  <script src="./config.js?v=20260509-1"></script>
+  <script src="./app.js?v=20260509-1"></script>
 </body>
 </html>

@@ -22,12 +22,6 @@ const comfortScoreMap = {
   "Somewhat comfortable": 4,
   "Very comfortable": 5
 };
-const familiarityScoreMap = {
-  "Never heard of them": 1,
-  "Heard of them": 2,
-  "Some familiarity": 3,
-  "Worked with them directly": 4
-};
 const taskDefinitions = [
   {
     id: "task1",
@@ -39,7 +33,7 @@ const taskDefinitions = [
   },
   {
     id: "task2",
-    title: "Task 2: Internal communications",
+    title: "Task 2: Decision letter",
     responseKeys: ["task2Finding", "task2Notes"],
     statusKey: "task2Outcome",
     statusLabel: "Completed",
@@ -47,7 +41,7 @@ const taskDefinitions = [
   },
   {
     id: "task3",
-    title: "Task 3: Email correspondence",
+    title: "Task 3: Internal communications",
     responseKeys: ["task3Finding", "task3Notes"],
     statusKey: "task3MetadataUnderstanding",
     statusLabel: "Metadata understood",
@@ -55,27 +49,27 @@ const taskDefinitions = [
   },
   {
     id: "task4",
-    title: "Task 4: Timeline",
+    title: "Task 4: Chronology",
     responseKeys: ["task4Narrative", "task4Notes"],
-    statusKey: "task4Summaries",
-    statusLabel: "Summaries used",
-    successValues: ["Yes"]
+    statusKey: "task4Helpfulness",
+    statusLabel: "Helpfulness score 4-5",
+    successValues: [4, 5]
   },
   {
     id: "task5",
-    title: "Task 5: Document exploration",
+    title: "Task 5: Redactions",
     responseKeys: ["task5Response", "task5Notes"],
-    statusKey: "task5LabelUnderstanding",
-    statusLabel: "Label understood",
+    statusKey: "task5RedactionInfo",
+    statusLabel: "Redaction info found",
     successValues: ["Yes"]
   },
   {
     id: "task6",
-    title: "Task 6: Redaction analysis",
+    title: "Task 6: Overall understanding",
     responseKeys: ["task6Response", "task6Notes"],
-    statusKey: "task6Stats",
-    statusLabel: "Stats found",
-    successValues: ["Yes"]
+    statusKey: "task6Response",
+    statusLabel: "Response recorded",
+    successValues: []
   }
 ];
 const themeLexicon = {
@@ -88,7 +82,7 @@ const themeLexicon = {
   clarity: ["clear", "purpose", "understand", "overview"],
   search: ["search", "query", "filter", "findability"],
   confidence: ["confident", "confidence", "comfortable", "uncertain"],
-  sensitivity: ["sensitive", "political", "minister", "prime minister", "rotterdam", "un"],
+  sensitivity: ["sensitive", "political", "minister", "prime minister", "avvn", "gaza", "un"],
   summaries: ["ai", "summary", "summaries"],
   friction: ["confusing", "hesitate", "hard", "difficult", "cumbersome"]
 };
@@ -127,6 +121,7 @@ function initializeSurveyPage() {
   const submitButton = form.querySelector('button[type="submit"]');
 
   bindRangeOutputs(form);
+  bindWooScoreCalculation(form);
 
   if (sessionDateField && !sessionDateField.value) {
     sessionDateField.value = new Date().toISOString().slice(0, 10);
@@ -409,6 +404,26 @@ function updateRangeOutput(field) {
   }
 
   output.textContent = `${field.value}/${field.max}`;
+}
+
+function bindWooScoreCalculation(form) {
+  const wooFieldNames = ["wooQ1", "wooQ2", "wooQ3", "wooQ4", "wooQ5"];
+  const scoreInput = form.elements.wooKnowledgeScore;
+  if (!scoreInput) {
+    return;
+  }
+
+  wooFieldNames.forEach((name) => {
+    form.querySelectorAll(`input[name="${name}"]`).forEach((radio) => {
+      radio.addEventListener("change", () => {
+        const total = wooFieldNames.reduce((sum, field) => {
+          const checked = form.querySelector(`input[name="${field}"]:checked`);
+          return sum + (checked ? Number(checked.value) : 0);
+        }, 0);
+        scoreInput.value = total;
+      });
+    });
+  });
 }
 
 function readResponses() {
@@ -738,9 +753,11 @@ function getUsableAiInsights(responses) {
 }
 
 function normalizeResponse(response) {
-  const familiarityScore = familiarityScoreMap[response.backgroundWooFamiliarity] || inferFamiliarityScore(response.backgroundWoo || "");
+  const wooScore = Number(response.wooKnowledgeScore) ||
+    (Number(response.wooQ1 || 0) + Number(response.wooQ2 || 0) + Number(response.wooQ3 || 0) + Number(response.wooQ4 || 0) + Number(response.wooQ5 || 0));
+  const wooNormalized = wooScore / 2; // scale 0–10 to 0–5
   const comfortScore = comfortScoreMap[response.backgroundComfort] || 0;
-  const backgroundScore = average([familiarityScore, comfortScore].filter(Boolean));
+  const backgroundScore = average([wooNormalized, comfortScore].filter(Boolean));
   const susResponses = response.susResponses && response.susResponses.length
     ? response.susResponses
     : susStatements.map((statement, index) => ({
@@ -751,34 +768,12 @@ function normalizeResponse(response) {
   return {
     ...response,
     responseId: getResponseRecordId(response),
-    familiarityScore,
+    wooScore,
     comfortScore,
     backgroundScore,
     susResponses,
     susScore: Number(response.susScore || calculateSusScore(susResponses))
   };
-}
-
-function inferFamiliarityScore(value) {
-  const text = String(value || "").toLowerCase();
-
-  if (!text) {
-    return 0;
-  }
-
-  if (/(worked|use often|regularly|expert)/.test(text)) {
-    return 4;
-  }
-
-  if (/(some familiarity|familiar|have used)/.test(text)) {
-    return 3;
-  }
-
-  if (/(heard|know of|aware)/.test(text)) {
-    return 2;
-  }
-
-  return 1;
 }
 
 function renderMetrics(responses) {
@@ -794,7 +789,7 @@ function renderMetrics(responses) {
   const averageTask2Time = responses.length ? average(responses.map((response) => Number(response.task2Time)).filter((value) => !Number.isNaN(value))).toFixed(1) : "0.0";
   const adoptionRate = responses.length ? `${Math.round((responses.filter((response) => isPositiveAdoption(response.closingAdoption)).length / responses.length) * 100)}%` : "0%";
   const frictionFlags = responses.reduce((count, response) => {
-    return count + Number(response.task2Outcome !== "Completed") + Number(response.task5LabelUnderstanding === "No") + Number(response.task6Stats === "No");
+    return count + Number(response.task2Outcome !== "Completed") + Number(response.task5RedactionInfo === "No");
   }, 0);
 
   const metrics = [
@@ -809,7 +804,7 @@ function renderMetrics(responses) {
     {
       label: "Avg. Background Score",
       value: averageBackground,
-      detail: "Mean of Woo familiarity and official-doc comfort. About 2 is low familiarity, 3 is moderate, 4+ is strong."
+      detail: "Mean of Woo knowledge score (0–5 normalised) and official-doc comfort. About 2 is low familiarity, 3 is moderate, 4+ is strong."
     },
     { label: "Task 2 Completion", value: completionRate },
     { label: "Avg. Task 2 Time", value: `${averageTask2Time} min` },
@@ -1269,8 +1264,8 @@ function renderRedactionUnderstandingChart(responses) {
 
   const rows = [
     {
-      label: "Found statistics",
-      value: responses.filter((response) => String(response.task6Stats || "") === "Yes").length,
+      label: "Found redaction information",
+      value: responses.filter((response) => String(response.task5RedactionInfo || "") === "Yes").length,
       max: responses.length
     },
     {
@@ -1623,7 +1618,7 @@ function flattenResponseForCsv(response) {
   });
 
   flattened.backgroundScore = Number(response.backgroundScore || 0).toFixed(2);
-  flattened.familiarityScore = response.familiarityScore || 0;
+  flattened.wooScore = response.wooScore || 0;
   flattened.comfortScore = response.comfortScore || 0;
 
   return flattened;
@@ -1866,7 +1861,7 @@ async function generateOpenAiInsights(responses, { apiKey, model }) {
   const dataset = responses.map((response) => ({
     participantId: response.participantId || "Unknown",
     background: {
-      familiarity: response.backgroundWooFamiliarity || response.backgroundWoo || "",
+      wooKnowledgeScore: response.wooScore || 0,
       comfort: response.backgroundComfort || "",
       score: Number(response.backgroundScore || 0).toFixed(2)
     },
