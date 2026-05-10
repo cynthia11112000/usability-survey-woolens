@@ -791,6 +791,9 @@ function renderMetrics(responses) {
   const frictionFlags = responses.reduce((count, response) => {
     return count + Number(response.task2Outcome !== "Completed") + Number(response.task5RedactionInfo === "No");
   }, 0);
+  const recommendScores = responses.map((response) => Number(response.closingRecommend)).filter((v) => !Number.isNaN(v) && v > 0);
+  const averageRecommend = recommendScores.length ? (recommendScores.reduce((sum, v) => sum + v, 0) / recommendScores.length).toFixed(1) : "n/a";
+  const condCCount = responses.filter((r) => Boolean(r.snelwijzerInitialBehavior)).length;
 
   const metrics = [
     { label: "Responses", value: responses.length },
@@ -808,7 +811,9 @@ function renderMetrics(responses) {
     },
     { label: "Task 2 Completion", value: completionRate },
     { label: "Avg. Task 2 Time", value: `${averageTask2Time} min` },
-    { label: "Likely Adoption", value: adoptionRate, detail: `${frictionFlags} friction flags logged` }
+    { label: "Likely Adoption", value: adoptionRate, detail: `${frictionFlags} friction flags logged` },
+    { label: "Avg. Recommend (1–10)", value: averageRecommend, detail: `${recommendScores.length} scores recorded` },
+    { label: "Condition C Sessions", value: condCCount, detail: "Quick Guide evaluation sessions" }
   ];
 
   metricGrid.innerHTML = metrics
@@ -943,6 +948,15 @@ function renderVisualCharts(responses) {
   renderTaskTimeChart(responses);
   renderTaskFrictionChart(responses);
   renderRedactionUnderstandingChart(responses);
+  renderConditionTask2Chart(responses);
+  renderConditionTask2TimeChart(responses);
+  renderConditionTask3Chart(responses);
+  renderConditionTask4Chart(responses);
+  renderConditionTask5Chart(responses);
+  renderGroupDistributionChart(responses);
+  renderGroupSusChart(responses);
+  renderQuickGuideScoresChart(responses);
+  renderQuickGuideBehaviorChart(responses);
   renderFeatureUsageHeatmap(responses);
   renderQualitativeThemeChart(responses);
 }
@@ -1287,6 +1301,310 @@ function renderRedactionUnderstandingChart(responses) {
   `;
 }
 
+function renderGroupDistributionChart(responses) {
+  const container = document.getElementById("group-distribution-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Group distribution will appear after the first response.");
+    return;
+  }
+
+  const groups = ["1", "2", "3", "4", "5", "6"];
+  const rows = groups.map((group) => ({
+    label: `Group ${group}`,
+    value: responses.filter((response) => String(response.group) === group).length,
+    max: responses.length
+  }));
+
+  container.innerHTML = `
+    <h3>Responses per group</h3>
+    <p class="muted-copy">Number of submitted sessions broken down by study group (1–6).</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderGroupSusChart(responses) {
+  const container = document.getElementById("group-sus-chart");
+
+  if (!responses.length) {
+    container.innerHTML = emptyState("Average SUS by group will appear after the first response.");
+    return;
+  }
+
+  const groups = ["1", "2", "3", "4", "5", "6"];
+  const rows = groups
+    .map((group) => {
+      const groupResponses = responses.filter((response) => String(response.group) === group);
+      const avgSus = groupResponses.length ? average(groupResponses.map((response) => response.susScore)) : null;
+      return {
+        label: `Group ${group}`,
+        value: avgSus ?? 0,
+        max: 100,
+        displayValue: avgSus !== null ? avgSus.toFixed(1) : "n/a"
+      };
+    });
+
+  container.innerHTML = `
+    <h3>Average SUS by group</h3>
+    <p class="muted-copy">Mean SUS score for each study group. Groups with no responses show "n/a".</p>
+    ${renderBarChart(rows, { decimals: 1 })}
+  `;
+}
+
+function isConditionA(response) {
+  return Boolean(response.task2OutcomeA || response.task2FindingA);
+}
+
+function isConditionBC(response) {
+  return Boolean(response.task2Outcome || response.task2Finding);
+}
+
+function isConditionC(response) {
+  return Boolean(response.snelwijzerInitialBehavior);
+}
+
+function renderConditionTask2Chart(responses) {
+  const container = document.getElementById("condition-task2-chart");
+  if (!responses.length) {
+    container.innerHTML = emptyState("Condition comparison will appear after the first response.");
+    return;
+  }
+
+  const condA = responses.filter(isConditionA);
+  const condBC = responses.filter(isConditionBC);
+
+  if (!condA.length && !condBC.length) {
+    container.innerHTML = emptyState("No Task 2 outcome data yet.");
+    return;
+  }
+
+  const rows = [
+    {
+      label: "Condition A — completed",
+      value: condA.filter((r) => r.task2OutcomeA === "Completed").length,
+      max: condA.length || 1
+    },
+    {
+      label: "Conditions B/C — completed",
+      value: condBC.filter((r) => r.task2Outcome === "Completed").length,
+      max: condBC.length || 1
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Task 2: Decision letter completion</h3>
+    <p class="muted-copy">Condition A uses the raw PDF; B and C use WOOLens (${condA.length} A session${condA.length !== 1 ? "s" : ""}, ${condBC.length} B/C session${condBC.length !== 1 ? "s" : ""}).</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderConditionTask2TimeChart(responses) {
+  const container = document.getElementById("condition-task2-time-chart");
+  if (!responses.length) {
+    container.innerHTML = emptyState("Condition time comparison will appear after the first response.");
+    return;
+  }
+
+  const condA = responses.filter((r) => r.task2TimeA);
+  const condBC = responses.filter((r) => r.task2Time);
+
+  if (!condA.length && !condBC.length) {
+    container.innerHTML = emptyState("No Task 2 timing data yet.");
+    return;
+  }
+
+  const avgA = condA.length ? average(condA.map((r) => Number(r.task2TimeA)).filter((v) => !Number.isNaN(v))) : 0;
+  const avgBC = condBC.length ? average(condBC.map((r) => Number(r.task2Time)).filter((v) => !Number.isNaN(v))) : 0;
+  const maxVal = Math.max(avgA, avgBC, 1);
+
+  const rows = [
+    {
+      label: "Condition A — avg minutes",
+      value: avgA,
+      max: maxVal,
+      displayValue: condA.length ? `${avgA.toFixed(1)} min` : "n/a"
+    },
+    {
+      label: "Conditions B/C — avg minutes",
+      value: avgBC,
+      max: maxVal,
+      displayValue: condBC.length ? `${avgBC.toFixed(1)} min` : "n/a"
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Task 2: Time on task by condition</h3>
+    <p class="muted-copy">Average minutes to find the decision letter, split by condition.</p>
+    ${renderBarChart(rows, { decimals: 1 })}
+  `;
+}
+
+function renderConditionTask3Chart(responses) {
+  const container = document.getElementById("condition-task3-chart");
+  if (!responses.length) {
+    container.innerHTML = emptyState("Condition comparison will appear after the first response.");
+    return;
+  }
+
+  const condA = responses.filter((r) => r.task3MetadataUnderstandingA);
+  const condBC = responses.filter((r) => r.task3MetadataUnderstanding);
+
+  if (!condA.length && !condBC.length) {
+    container.innerHTML = emptyState("No Task 3 metadata understanding data yet.");
+    return;
+  }
+
+  const rows = [
+    {
+      label: "Condition A — understood (Yes)",
+      value: condA.filter((r) => r.task3MetadataUnderstandingA === "Yes").length,
+      max: condA.length || 1
+    },
+    {
+      label: "Conditions B/C — understood (Yes)",
+      value: condBC.filter((r) => r.task3MetadataUnderstanding === "Yes").length,
+      max: condBC.length || 1
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Task 3: Sender/receiver metadata understood</h3>
+    <p class="muted-copy">Share of participants who understood who sent and received the email correspondence.</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderConditionTask4Chart(responses) {
+  const container = document.getElementById("condition-task4-chart");
+  if (!responses.length) {
+    container.innerHTML = emptyState("Condition comparison will appear after the first response.");
+    return;
+  }
+
+  const condA = responses.filter((r) => r.task4HelpfulnessA);
+  const condBC = responses.filter((r) => r.task4Helpfulness);
+
+  if (!condA.length && !condBC.length) {
+    container.innerHTML = emptyState("No Task 4 helpfulness data yet.");
+    return;
+  }
+
+  const avgA = condA.length ? average(condA.map((r) => Number(r.task4HelpfulnessA)).filter((v) => !Number.isNaN(v))) : 0;
+  const avgBC = condBC.length ? average(condBC.map((r) => Number(r.task4Helpfulness)).filter((v) => !Number.isNaN(v))) : 0;
+
+  const rows = [
+    {
+      label: "Condition A — helpfulness (avg)",
+      value: avgA,
+      max: 5,
+      displayValue: condA.length ? avgA.toFixed(2) : "n/a"
+    },
+    {
+      label: "Conditions B/C — helpfulness (avg)",
+      value: avgBC,
+      max: 5,
+      displayValue: condBC.length ? avgBC.toFixed(2) : "n/a"
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Task 4: Chronology helpfulness score (1–5)</h3>
+    <p class="muted-copy">Average perceived helpfulness of the document or timeline view for reconstructing chronology.</p>
+    ${renderBarChart(rows, { decimals: 2 })}
+  `;
+}
+
+function renderConditionTask5Chart(responses) {
+  const container = document.getElementById("condition-task5-chart");
+  if (!responses.length) {
+    container.innerHTML = emptyState("Condition comparison will appear after the first response.");
+    return;
+  }
+
+  const condA = responses.filter((r) => r.task5RedactionInfoA);
+  const condBC = responses.filter((r) => r.task5RedactionInfo);
+
+  if (!condA.length && !condBC.length) {
+    container.innerHTML = emptyState("No Task 5 redaction data yet.");
+    return;
+  }
+
+  const rows = [
+    {
+      label: "Condition A — found redaction info",
+      value: condA.filter((r) => r.task5RedactionInfoA === "Yes").length,
+      max: condA.length || 1
+    },
+    {
+      label: "Conditions B/C — found redaction info",
+      value: condBC.filter((r) => r.task5RedactionInfo === "Yes").length,
+      max: condBC.length || 1
+    }
+  ];
+
+  container.innerHTML = `
+    <h3>Task 5: Redaction information found</h3>
+    <p class="muted-copy">Share of participants who successfully located redaction information by condition.</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
+function renderQuickGuideScoresChart(responses) {
+  const container = document.getElementById("quick-guide-scores-chart");
+  const condC = responses.filter(isConditionC);
+
+  if (!condC.length) {
+    container.innerHTML = emptyState("Quick Guide scores will appear when Condition C sessions are submitted.");
+    return;
+  }
+
+  const fields = [
+    { key: "snelwijzerHelpfulness", label: "Perceived helpfulness" },
+    { key: "snelwijzerEaseOfUse", label: "Ease of use" },
+    { key: "snelwijzerTrust", label: "Epistemic trust" },
+    { key: "snelwijzerConfidence", label: "Confidence gain" }
+  ];
+
+  const rows = fields.map((field) => {
+    const vals = condC.map((r) => Number(r[field.key])).filter((v) => !Number.isNaN(v) && v > 0);
+    return {
+      label: field.label,
+      value: vals.length ? average(vals) : 0,
+      max: 5,
+      displayValue: vals.length ? average(vals).toFixed(2) : "n/a"
+    };
+  });
+
+  container.innerHTML = `
+    <h3>Quick Guide evaluation scores (Condition C, n=${condC.length})</h3>
+    <p class="muted-copy">Average participant ratings for each Quick Guide dimension. Each score is 1–5.</p>
+    ${renderBarChart(rows, { decimals: 2 })}
+  `;
+}
+
+function renderQuickGuideBehaviorChart(responses) {
+  const container = document.getElementById("quick-guide-behavior-chart");
+  const condC = responses.filter(isConditionC);
+
+  if (!condC.length) {
+    container.innerHTML = emptyState("Quick Guide behaviour data will appear when Condition C sessions are submitted.");
+    return;
+  }
+
+  const rows = [
+    { label: "Read it", value: condC.filter((r) => r.snelwijzerInitialBehavior === "Read").length, max: condC.length },
+    { label: "Skimmed briefly", value: condC.filter((r) => r.snelwijzerInitialBehavior === "Skimmed").length, max: condC.length },
+    { label: "Immediately closed", value: condC.filter((r) => r.snelwijzerInitialBehavior === "Immediately closed").length, max: condC.length },
+    { label: "Referred back during tasks", value: condC.filter((r) => r.snelwijzerReferBack === "Yes").length, max: condC.length }
+  ];
+
+  container.innerHTML = `
+    <h3>Quick Guide initial behaviour (Condition C, n=${condC.length})</h3>
+    <p class="muted-copy">How participants first engaged with the Quick Guide and whether they returned to it during the tasks.</p>
+    ${renderBarChart(rows, { integer: true })}
+  `;
+}
+
 function renderFeatureUsageHeatmap(responses) {
   const container = document.getElementById("feature-usage-heatmap");
 
@@ -1449,6 +1767,10 @@ function renderResponses(responses) {
           </div>
           <div class="candidate-metrics">
             <div class="mini-metric">
+              <span>Group</span>
+              <strong>${response.group ? escapeHtml(String(response.group)) : "n/a"}</strong>
+            </div>
+            <div class="mini-metric">
               <span>SUS</span>
               <strong>${Number(response.susScore || 0).toFixed(1)}</strong>
             </div>
@@ -1459,6 +1781,18 @@ function renderResponses(responses) {
             <div class="mini-metric">
               <span>Task 2 time</span>
               <strong>${response.task2Time ? `${escapeHtml(response.task2Time)} min` : "n/a"}</strong>
+            </div>
+            <div class="mini-metric">
+              <span>Recommend</span>
+              <strong>${response.closingRecommend ? escapeHtml(String(response.closingRecommend)) + "/10" : "n/a"}</strong>
+            </div>
+            <div class="mini-metric">
+              <span>Age</span>
+              <strong>${response.age ? escapeHtml(String(response.age)) : "n/a"}</strong>
+            </div>
+            <div class="mini-metric">
+              <span>Education</span>
+              <strong>${response.education ? escapeHtml(String(response.education)) : "n/a"}</strong>
             </div>
           </div>
           <div class="candidate-task-row">${candidateTaskRow}</div>
